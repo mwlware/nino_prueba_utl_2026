@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "nombre": "Brandon Niño",
+    "email": "brandon@example.com",
+    "repo": "https://github.com/usuario/PruebaTecnica",
+    "fecha_generacion": "2026-07-13T14:36:38.013439"
+  },
+  "verificacion": {
+    "municipios_cargados": "4/4",
+    "municipios": {
+      "TUNJA": {
+        "amb": "0700001",
+        "filas_votos": 6762,
+        "total_votos": 146704,
+        "zonas": 6,
+        "cargado": true
+      },
+      "DUITAMA": {
+        "amb": "0700079",
+        "filas_votos": 5635,
+        "total_votos": 97030,
+        "zonas": 5,
+        "cargado": true
+      },
+      "SOGAMOSO": {
+        "amb": "0700277",
+        "filas_votos": 5635,
+        "total_votos": 101728,
+        "zonas": 5,
+        "cargado": true
+      },
+      "PAIPA": {
+        "amb": "0700181",
+        "filas_votos": 3381,
+        "total_votos": 33200,
+        "zonas": 3,
+        "cargado": true
+      }
+    },
+    "tablas": {
+      "municipios": 123,
+      "partidos": 25,
+      "candidatos": 4508,
+      "votos": 21413,
+      "carga_log": 76
+    },
+    "queries_sql": [
+      {
+        "archivo": "tarea_3_1.sql",
+        "descripcion": "Ratio arrastre Verde CA->SE por zona y municipio",
+        "status": "OK",
+        "filas_resultado": 19,
+        "muestra_primera_fila": [
+          "DUITAMA",
+          "070007901",
+          "1949",
+          "2585",
+          "1.326"
+        ]
+      },
+      {
+        "archivo": "tarea_3_2.sql",
+        "descripcion": "Dominancia >60% candidato vs partido en zona",
+        "status": "OK",
+        "filas_resultado": 45,
+        "muestra_primera_fila": [
+          "TUNJA",
+          "070000198",
+          "CA",
+          "Partido 120",
+          "Jairo Enrique Castiblanco Parra",
+          "2",
+          "2",
+          "100.0"
+        ]
+      },
+      {
+        "archivo": "tarea_3_3.sql",
+        "descripcion": "Top 5 candidatos por atribucion SE",
+        "status": "OK",
+        "filas_resultado": 5,
+        "muestra_primera_fila": [
+          "TUNJA",
+          "Ramiro Barragan Adame",
+          "Alianza Verde",
+          "4294",
+          "15836",
+          "16296",
+          "4418.7"
+        ]
+      }
+    ]
+  },
+  "archivos": {
+    "schema": "db/schema.sql",
+    "etl": "db/etl.py",
+    "base_datos": "db/puestos_2026.db",
+    "scraper": "scraper/scraper.py",
+    "sql": [
+      "sql/tarea_3_1.sql",
+      "sql/tarea_3_2.sql",
+      "sql/tarea_3_3.sql"
+    ],
+    "sample_data": "sample_data/"
+  }
+}
