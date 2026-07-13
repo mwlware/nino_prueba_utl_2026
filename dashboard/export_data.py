@@ -1,15 +1,47 @@
 """
 Exporta datos desde puestos_2026.db a dashboard/data.json para el dashboard.
+Incluye mapagan (123 municipios, partido ganador) para el mapa coroplético.
 """
 
 import json
 import os
 import sqlite3
 import sys
+import unicodedata
+import requests
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(PROJECT_ROOT, "db", "puestos_2026.db")
 OUTPUT_PATH = os.path.join(PROJECT_ROOT, "dashboard", "data.json")
+GEOJSON_PATH = os.path.join(PROJECT_ROOT, "maps", "boyaca_simple.geojson")
+
+BASE_URL = "https://resultadospreccongreso2026.registraduria.gov.co/json/ACT"
+
+# Colores por codpar (CA y SE)
+COLORES_CODPAR = {
+    "5": "#007C34", "57": "#007C34",    # Alianza Verde
+    "87": "#7B2D8B", "92": "#7B2D8B",   # Pacto Histórico
+    "10": "#1E477D",                     # Centro Democrático
+    "2": "#E07B00",                      # Conservador
+}
+NOMBRES_CODPAR = {
+    "5": "Alianza Verde", "57": "Alianza Verde",
+    "87": "Pacto Histórico", "92": "Pacto Histórico",
+    "10": "Centro Democrático",
+    "2": "Conservador",
+}
+
+# Alias para join GeoJSON ↔ mapagan por nombre normalizado
+ALIAS_NOMBRE = {
+    "AQUITANIA (PUEBLOVIEJO)": "AQUITANIA",
+    "GUICAN": "GÜICÁN DE LA SIERRA",
+    "VILLA DE LEIVA": "VILLA DE LEYVA",
+}
+
+def normalizar(s):
+    """Mayúsculas sin tildes para join por nombre."""
+    s = s.upper().strip()
+    return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
 
 AMBS = ["0700001", "0700079", "0700277", "0700181"]
 AMB_FILTER = ",".join(f"'{a}'" for a in AMBS)
@@ -105,6 +137,61 @@ def export():
         "Conservador": "#E07B00",
     }
 
+    # 4. Mapagan: partido ganador por municipio (123 municipios, CA y SE)
+    data["mapagan"] = {}
+    for corp in ["CA", "SE"]:
+        cam_target = "1" if corp == "CA" else "0"
+        dept = requests.get(f"{BASE_URL}/{corp}/0700.json", timeout=30).json()
+        for cam in dept["camaras"]:
+            if cam["cam"] == cam_target:
+                entries = []
+                for m in cam["mapagan"]:
+                    codpar = m["codpar"]
+                    entries.append({
+                        "amb": m["amb"],
+                        "nombre": m["nombre"].strip(),
+                        "codpar": codpar,
+                        "partido": NOMBRES_CODPAR.get(codpar, f"Partido {codpar}"),
+                        "color": COLORES_CODPAR.get(codpar, "#AAAAAA"),
+                        "vot": int(m["vot"]),
+                        "votant": int(m["votant"]),
+                        "mesesc": int(m["mesesc"]),
+                        "pmesesc": m["pmesesc"],
+                    })
+                data["mapagan"][corp] = entries
+                break
+
+    # 5. GeoJSON simplificado de Boyacá (para mapa coroplético)
+    with open(GEOJSON_PATH, encoding="utf-8") as f:
+        geojson = json.load(f)
+
+    # Crear índice por nombre normalizado para el join
+    geo_by_name = {}
+    for feat in geojson["features"]:
+        name = feat["properties"]["name"]
+        geo_by_name[normalizar(name)] = name
+
+    # Verificar cobertura del join
+    mapagan_ca = data["mapagan"]["CA"]
+    matched = 0
+    unmatched = []
+    for m in mapagan_ca:
+        nombre_map = m["nombre"]
+        # Aplicar alias
+        nombre_buscar = ALIAS_NOMBRE.get(nombre_map, nombre_map)
+        norm = normalizar(nombre_buscar)
+        if norm in geo_by_name:
+            matched += 1
+        else:
+            unmatched.append(nombre_map)
+
+    print(f"  Join GeoJSON: {matched}/123 municipios casados")
+    if unmatched:
+        print(f"  Sin casar: {unmatched}")
+
+    data["geojson"] = geojson
+    data["alias_nombre"] = ALIAS_NOMBRE
+
     con.close()
 
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
@@ -114,6 +201,8 @@ def export():
     print(f"  Comparativo: {len(data['comparativo'])} municipios")
     print(f"  Por municipio: {len(data['por_municipio'])} entradas")
     print(f"  Arrastre: {len(data['arrastre'])} zonas")
+    print(f"  Mapagan CA: {len(data['mapagan']['CA'])} municipios")
+    print(f"  Mapagan SE: {len(data['mapagan']['SE'])} municipios")
 
 
 if __name__ == "__main__":
