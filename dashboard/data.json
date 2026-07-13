@@ -1,0 +1,555 @@
+{
+  "comparativo": [
+    {
+      "municipio": "TUNJA",
+      "amb": "0700001",
+      "votos_ca": 72461
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "amb": "0700277",
+      "votos_ca": 50881
+    },
+    {
+      "municipio": "DUITAMA",
+      "amb": "0700079",
+      "votos_ca": 48187
+    },
+    {
+      "municipio": "PAIPA",
+      "amb": "0700181",
+      "votos_ca": 16807
+    }
+  ],
+  "por_municipio": {
+    "TUNJA": {
+      "amb": "0700001",
+      "top10_ca": [
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 4294
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 3986
+        },
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 3933
+        },
+        {
+          "candidato": "Ingrid Marlen Sogamoso Alfonso",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 2903
+        },
+        {
+          "candidato": "Fabian Camilo Rojas Barrera",
+          "partido": "Partido 122",
+          "color": "#888888",
+          "votos": 2848
+        },
+        {
+          "candidato": "Wilder Ivan Suesca Ochoa",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 2756
+        },
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 2341
+        },
+        {
+          "candidato": "Jose Dario Mahecha Castillo",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 2242
+        },
+        {
+          "candidato": "Oscar Leonardo Avila Romero",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 2180
+        },
+        {
+          "candidato": "Jairo Enrique Castiblanco Parra",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1911
+        }
+      ],
+      "lider_se": {
+        "partido": "Pacto Histórico",
+        "color": "#7B2D8B",
+        "votos": 20651
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 20651
+        },
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 16296
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 10613
+        },
+        {
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 5978
+        },
+        {
+          "partido": "Partido 3",
+          "color": "#888888",
+          "votos": 5153
+        }
+      ]
+    },
+    "DUITAMA": {
+      "amb": "0700079",
+      "top10_ca": [
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 4559
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 2198
+        },
+        {
+          "candidato": "Hernel David Ortega Gomez",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 1558
+        },
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1518
+        },
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1316
+        },
+        {
+          "candidato": "Ingrid Marlen Sogamoso Alfonso",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 1148
+        },
+        {
+          "candidato": "Nancy Yaneth Zapata Pachon",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1136
+        },
+        {
+          "candidato": "Jicly Esgardo Mutis Isaza",
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 1064
+        },
+        {
+          "candidato": "Eduar Alexis Triana Rincon",
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 924
+        },
+        {
+          "candidato": "Jose Dario Mahecha Castillo",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 920
+        }
+      ],
+      "lider_se": {
+        "partido": "Pacto Histórico",
+        "color": "#7B2D8B",
+        "votos": 15423
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 15423
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 9205
+        },
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 8371
+        },
+        {
+          "partido": "Partido 3",
+          "color": "#888888",
+          "votos": 3098
+        },
+        {
+          "partido": "Partido 17",
+          "color": "#888888",
+          "votos": 2794
+        }
+      ]
+    },
+    "SOGAMOSO": {
+      "amb": "0700277",
+      "top10_ca": [
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 5568
+        },
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 2771
+        },
+        {
+          "candidato": "Diana Paola Herrera Nuñez",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1962
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1757
+        },
+        {
+          "candidato": "Nadia Alexandra Carreño Avella",
+          "partido": "Partido 122",
+          "color": "#888888",
+          "votos": 1736
+        },
+        {
+          "candidato": "Fabian Camilo Rojas Barrera",
+          "partido": "Partido 122",
+          "color": "#888888",
+          "votos": 1380
+        },
+        {
+          "candidato": "Yury Neill Diaz Aranguren",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1342
+        },
+        {
+          "candidato": "Jairo Enrique Castiblanco Parra",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1319
+        },
+        {
+          "candidato": "Oscar Leonardo Avila Romero",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1237
+        },
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1201
+        }
+      ],
+      "lider_se": {
+        "partido": "Pacto Histórico",
+        "color": "#7B2D8B",
+        "votos": 13957
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 13957
+        },
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 8195
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 8182
+        },
+        {
+          "partido": "Partido 17",
+          "color": "#888888",
+          "votos": 5645
+        },
+        {
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 5035
+        }
+      ]
+    },
+    "PAIPA": {
+      "amb": "0700181",
+      "top10_ca": [
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 4756
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1465
+        },
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1393
+        },
+        {
+          "candidato": "Eduar Alexis Triana Rincon",
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 869
+        },
+        {
+          "candidato": "Wilder Ivan Suesca Ochoa",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 729
+        },
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 353
+        },
+        {
+          "candidato": "Oscar Leonardo Avila Romero",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 273
+        },
+        {
+          "candidato": "Nancy Yaneth Zapata Pachon",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 268
+        },
+        {
+          "candidato": "Ingrid Marlen Sogamoso Alfonso",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 195
+        },
+        {
+          "candidato": "Hernel David Ortega Gomez",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 185
+        }
+      ],
+      "lider_se": {
+        "partido": "Alianza Verde",
+        "color": "#007C34",
+        "votos": 4161
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 4161
+        },
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 3669
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 2771
+        },
+        {
+          "partido": "Partido 3",
+          "color": "#888888",
+          "votos": 1649
+        },
+        {
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1530
+        }
+      ]
+    }
+  },
+  "arrastre": [
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007901",
+      "votos_ca": 1949,
+      "votos_se": 2585,
+      "ratio": 1.326
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007902",
+      "votos_ca": 3500,
+      "votos_se": 4491,
+      "ratio": 1.283
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007990",
+      "votos_ca": 439,
+      "votos_se": 554,
+      "ratio": 1.262
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007998",
+      "votos_ca": 6,
+      "votos_se": 2,
+      "ratio": 0.333
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007999",
+      "votos_ca": 613,
+      "votos_se": 739,
+      "ratio": 1.206
+    },
+    {
+      "municipio": "PAIPA",
+      "zona": "070018101",
+      "votos_ca": 2980,
+      "votos_se": 1785,
+      "ratio": 0.599
+    },
+    {
+      "municipio": "PAIPA",
+      "zona": "070018102",
+      "votos_ca": 3588,
+      "votos_se": 2150,
+      "ratio": 0.599
+    },
+    {
+      "municipio": "PAIPA",
+      "zona": "070018199",
+      "votos_ca": 603,
+      "votos_se": 226,
+      "ratio": 0.375
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027701",
+      "votos_ca": 3137,
+      "votos_se": 3046,
+      "ratio": 0.971
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027702",
+      "votos_ca": 4371,
+      "votos_se": 4550,
+      "ratio": 1.041
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027790",
+      "votos_ca": 485,
+      "votos_se": 479,
+      "ratio": 0.988
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027798",
+      "votos_ca": 3,
+      "votos_se": 3,
+      "ratio": 1.0
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027799",
+      "votos_ca": 90,
+      "votos_se": 117,
+      "ratio": 1.3
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000101",
+      "votos_ca": 4821,
+      "votos_se": 4986,
+      "ratio": 1.034
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000102",
+      "votos_ca": 5967,
+      "votos_se": 6106,
+      "ratio": 1.023
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000103",
+      "votos_ca": 4079,
+      "votos_se": 4256,
+      "ratio": 1.043
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000190",
+      "votos_ca": 911,
+      "votos_se": 908,
+      "ratio": 0.997
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000198",
+      "votos_ca": 5,
+      "votos_se": 5,
+      "ratio": 1.0
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000199",
+      "votos_ca": 53,
+      "votos_se": 35,
+      "ratio": 0.66
+    }
+  ],
+  "colores_partidos": {
+    "Alianza Verde": "#007C34",
+    "Pacto Histórico": "#7B2D8B",
+    "Centro Democrático": "#1E477D",
+    "Conservador": "#E07B00"
+  }
+}

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Congreso Boyacá 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  /* === Dark mode con CSS custom properties (+3 bonus) === */
+  :root {
+    --bg: #ffffff;
+    --bg-card: #f8f9fa;
+    --text: #1a1a2e;
+    --text-muted: #555;
+    --border: #dee2e6;
+    --shadow: rgba(0,0,0,0.08);
+    --btn-bg: #e9ecef;
+    --btn-text: #333;
+    --ref-line: rgba(255,0,0,0.5);
+  }
+  [data-theme="dark"] {
+    --bg: #1a1a2e;
+    --bg-card: #16213e;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --border: #333;
+    --shadow: rgba(0,0,0,0.3);
+    --btn-bg: #0f3460;
+    --btn-text: #e0e0e0;
+    --ref-line: rgba(255,80,80,0.7);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.5; padding: 1rem; transition: background 0.3s, color 0.3s;
+  }
+  header {
+    text-align: center; padding: 1.5rem 0 1rem;
+    border-bottom: 2px solid var(--border); margin-bottom: 1.5rem;
+  }
+  header h1 { font-size: 1.6rem; }
+  header p { color: var(--text-muted); font-size: 0.9rem; }
+  .toolbar {
+    display: flex; justify-content: flex-end; gap: 0.5rem;
+    margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .btn {
+    padding: 0.4rem 0.9rem; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--btn-bg); color: var(--btn-text); cursor: pointer;
+    font-size: 0.85rem; transition: all 0.2s;
+  }
+  .btn:hover { opacity: 0.8; }
+  .section {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem; margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .section h2 {
+    font-size: 1.15rem; margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
+  }
+  .chart-wrap { position: relative; max-height: 420px; }
+  select {
+    padding: 0.4rem 0.7rem; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--btn-bg); color: var(--btn-text); font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+  .lider-badge {
+    display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px;
+    color: #fff; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.8rem;
+  }
+  .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .flex-row > div { flex: 1; min-width: 300px; }
+  @media (max-width: 700px) { .flex-row { flex-direction: column; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Dashboard Congreso Boyacá 2026</h1>
+  <p>Resultados preconteo — Cámara y Senado — 4 municipios</p>
+</header>
+
+<div class="toolbar">
+  <button class="btn" id="btnTheme" onclick="toggleTheme()">Modo oscuro</button>
+  <button class="btn" id="btnExportComp" onclick="exportCSV('comparativo')">CSV Comparativo</button>
+  <button class="btn" id="btnExportMuni" onclick="exportCSV('municipio')">CSV Municipio</button>
+  <button class="btn" id="btnExportArr" onclick="exportCSV('arrastre')">CSV Arrastre</button>
+</div>
+
+<!-- Sección 1: Comparativo -->
+<div class="section">
+  <h2>1. Comparativo — Votos CA totales por municipio</h2>
+  <div class="chart-wrap"><canvas id="chartComparativo"></canvas></div>
+</div>
+
+<!-- Sección 2: Por Municipio -->
+<div class="section">
+  <h2>2. Por Municipio — Top 10 candidatos CA + partido líder SE</h2>
+  <select id="selMunicipio" onchange="renderMunicipio()"></select>
+  <div id="liderSE"></div>
+  <div class="flex-row">
+    <div><div class="chart-wrap"><canvas id="chartCandidatos"></canvas></div></div>
+    <div><div class="chart-wrap"><canvas id="chartPartidosSE"></canvas></div></div>
+  </div>
+</div>
+
+<!-- Sección 3: Arrastre -->
+<div class="section">
+  <h2>3. Arrastre — Ratio Verde CA→SE por zona</h2>
+  <select id="selArrastre" onchange="renderArrastre()"></select>
+  <div class="chart-wrap"><canvas id="chartArrastre"></canvas></div>
+</div>
+
+<script>
+let DATA = null;
+let charts = {};
+
+// Datos embebidos desde data.json (funciona sin servidor, con file://)
+const EMBEDDED_DATA = {
+  "comparativo": [
+    {
+      "municipio": "TUNJA",
+      "amb": "0700001",
+      "votos_ca": 72461
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "amb": "0700277",
+      "votos_ca": 50881
+    },
+    {
+      "municipio": "DUITAMA",
+      "amb": "0700079",
+      "votos_ca": 48187
+    },
+    {
+      "municipio": "PAIPA",
+      "amb": "0700181",
+      "votos_ca": 16807
+    }
+  ],
+  "por_municipio": {
+    "TUNJA": {
+      "amb": "0700001",
+      "top10_ca": [
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 4294
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 3986
+        },
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 3933
+        },
+        {
+          "candidato": "Ingrid Marlen Sogamoso Alfonso",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 2903
+        },
+        {
+          "candidato": "Fabian Camilo Rojas Barrera",
+          "partido": "Partido 122",
+          "color": "#888888",
+          "votos": 2848
+        },
+        {
+          "candidato": "Wilder Ivan Suesca Ochoa",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 2756
+        },
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 2341
+        },
+        {
+          "candidato": "Jose Dario Mahecha Castillo",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 2242
+        },
+        {
+          "candidato": "Oscar Leonardo Avila Romero",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 2180
+        },
+        {
+          "candidato": "Jairo Enrique Castiblanco Parra",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1911
+        }
+      ],
+      "lider_se": {
+        "partido": "Pacto Histórico",
+        "color": "#7B2D8B",
+        "votos": 20651
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 20651
+        },
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 16296
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 10613
+        },
+        {
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 5978
+        },
+        {
+          "partido": "Partido 3",
+          "color": "#888888",
+          "votos": 5153
+        }
+      ]
+    },
+    "DUITAMA": {
+      "amb": "0700079",
+      "top10_ca": [
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 4559
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 2198
+        },
+        {
+          "candidato": "Hernel David Ortega Gomez",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 1558
+        },
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1518
+        },
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1316
+        },
+        {
+          "candidato": "Ingrid Marlen Sogamoso Alfonso",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 1148
+        },
+        {
+          "candidato": "Nancy Yaneth Zapata Pachon",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1136
+        },
+        {
+          "candidato": "Jicly Esgardo Mutis Isaza",
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 1064
+        },
+        {
+          "candidato": "Eduar Alexis Triana Rincon",
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 924
+        },
+        {
+          "candidato": "Jose Dario Mahecha Castillo",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 920
+        }
+      ],
+      "lider_se": {
+        "partido": "Pacto Histórico",
+        "color": "#7B2D8B",
+        "votos": 15423
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 15423
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 9205
+        },
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 8371
+        },
+        {
+          "partido": "Partido 3",
+          "color": "#888888",
+          "votos": 3098
+        },
+        {
+          "partido": "Partido 17",
+          "color": "#888888",
+          "votos": 2794
+        }
+      ]
+    },
+    "SOGAMOSO": {
+      "amb": "0700277",
+      "top10_ca": [
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 5568
+        },
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 2771
+        },
+        {
+          "candidato": "Diana Paola Herrera Nuñez",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1962
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1757
+        },
+        {
+          "candidato": "Nadia Alexandra Carreño Avella",
+          "partido": "Partido 122",
+          "color": "#888888",
+          "votos": 1736
+        },
+        {
+          "candidato": "Fabian Camilo Rojas Barrera",
+          "partido": "Partido 122",
+          "color": "#888888",
+          "votos": 1380
+        },
+        {
+          "candidato": "Yury Neill Diaz Aranguren",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1342
+        },
+        {
+          "candidato": "Jairo Enrique Castiblanco Parra",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 1319
+        },
+        {
+          "candidato": "Oscar Leonardo Avila Romero",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1237
+        },
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1201
+        }
+      ],
+      "lider_se": {
+        "partido": "Pacto Histórico",
+        "color": "#7B2D8B",
+        "votos": 13957
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 13957
+        },
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 8195
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 8182
+        },
+        {
+          "partido": "Partido 17",
+          "color": "#888888",
+          "votos": 5645
+        },
+        {
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 5035
+        }
+      ]
+    },
+    "PAIPA": {
+      "amb": "0700181",
+      "top10_ca": [
+        {
+          "candidato": "Yamit Noe Hurtado Neira",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 4756
+        },
+        {
+          "candidato": "Jaime Raul Salamanca Torres",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 1465
+        },
+        {
+          "candidato": "Hector David Chaparro Chaparro",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1393
+        },
+        {
+          "candidato": "Eduar Alexis Triana Rincon",
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 869
+        },
+        {
+          "candidato": "Wilder Ivan Suesca Ochoa",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 729
+        },
+        {
+          "candidato": "Ramiro Barragan Adame",
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 353
+        },
+        {
+          "candidato": "Oscar Leonardo Avila Romero",
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 273
+        },
+        {
+          "candidato": "Nancy Yaneth Zapata Pachon",
+          "partido": "Partido 120",
+          "color": "#888888",
+          "votos": 268
+        },
+        {
+          "candidato": "Ingrid Marlen Sogamoso Alfonso",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 195
+        },
+        {
+          "candidato": "Hernel David Ortega Gomez",
+          "partido": "Partido 121",
+          "color": "#888888",
+          "votos": 185
+        }
+      ],
+      "lider_se": {
+        "partido": "Alianza Verde",
+        "color": "#007C34",
+        "votos": 4161
+      },
+      "top5_partidos_se": [
+        {
+          "partido": "Alianza Verde",
+          "color": "#007C34",
+          "votos": 4161
+        },
+        {
+          "partido": "Pacto Histórico",
+          "color": "#7B2D8B",
+          "votos": 3669
+        },
+        {
+          "partido": "Centro Democrático",
+          "color": "#1E477D",
+          "votos": 2771
+        },
+        {
+          "partido": "Partido 3",
+          "color": "#888888",
+          "votos": 1649
+        },
+        {
+          "partido": "Conservador",
+          "color": "#E07B00",
+          "votos": 1530
+        }
+      ]
+    }
+  },
+  "arrastre": [
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007901",
+      "votos_ca": 1949,
+      "votos_se": 2585,
+      "ratio": 1.326
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007902",
+      "votos_ca": 3500,
+      "votos_se": 4491,
+      "ratio": 1.283
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007990",
+      "votos_ca": 439,
+      "votos_se": 554,
+      "ratio": 1.262
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007998",
+      "votos_ca": 6,
+      "votos_se": 2,
+      "ratio": 0.333
+    },
+    {
+      "municipio": "DUITAMA",
+      "zona": "070007999",
+      "votos_ca": 613,
+      "votos_se": 739,
+      "ratio": 1.206
+    },
+    {
+      "municipio": "PAIPA",
+      "zona": "070018101",
+      "votos_ca": 2980,
+      "votos_se": 1785,
+      "ratio": 0.599
+    },
+    {
+      "municipio": "PAIPA",
+      "zona": "070018102",
+      "votos_ca": 3588,
+      "votos_se": 2150,
+      "ratio": 0.599
+    },
+    {
+      "municipio": "PAIPA",
+      "zona": "070018199",
+      "votos_ca": 603,
+      "votos_se": 226,
+      "ratio": 0.375
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027701",
+      "votos_ca": 3137,
+      "votos_se": 3046,
+      "ratio": 0.971
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027702",
+      "votos_ca": 4371,
+      "votos_se": 4550,
+      "ratio": 1.041
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027790",
+      "votos_ca": 485,
+      "votos_se": 479,
+      "ratio": 0.988
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027798",
+      "votos_ca": 3,
+      "votos_se": 3,
+      "ratio": 1.0
+    },
+    {
+      "municipio": "SOGAMOSO",
+      "zona": "070027799",
+      "votos_ca": 90,
+      "votos_se": 117,
+      "ratio": 1.3
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000101",
+      "votos_ca": 4821,
+      "votos_se": 4986,
+      "ratio": 1.034
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000102",
+      "votos_ca": 5967,
+      "votos_se": 6106,
+      "ratio": 1.023
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000103",
+      "votos_ca": 4079,
+      "votos_se": 4256,
+      "ratio": 1.043
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000190",
+      "votos_ca": 911,
+      "votos_se": 908,
+      "ratio": 0.997
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000198",
+      "votos_ca": 5,
+      "votos_se": 5,
+      "ratio": 1.0
+    },
+    {
+      "municipio": "TUNJA",
+      "zona": "070000199",
+      "votos_ca": 53,
+      "votos_se": 35,
+      "ratio": 0.66
+    }
+  ],
+  "colores_partidos": {
+    "Alianza Verde": "#007C34",
+    "Pacto Histórico": "#7B2D8B",
+    "Centro Democrático": "#1E477D",
+    "Conservador": "#E07B00"
+  }
+};
+
+// Intentar fetch (servidor) o usar datos embebidos (file://)
+fetch('data.json')
+  .then(r => { if (!r.ok) throw new Error('fetch failed'); return r.json(); })
+  .then(d => { DATA = d; init(); })
+  .catch(() => { DATA = EMBEDDED_DATA; init(); });
+
+function init() {
+  renderComparativo();
+  populateSelectors();
+  renderMunicipio();
+  renderArrastre();
+}
+
+// === 1. Comparativo ===
+function renderComparativo() {
+  const d = DATA.comparativo;
+  const ctx = document.getElementById('chartComparativo').getContext('2d');
+  if (charts.comp) charts.comp.destroy();
+  charts.comp = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: d.map(x => x.municipio),
+      datasets: [{
+        label: 'Votos CA',
+        data: d.map(x => x.votos_ca),
+        backgroundColor: ['#1E477D', '#007C34', '#E07B00', '#7B2D8B'],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => c.raw.toLocaleString('es-CO') + ' votos' } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: getCSS('--text-muted'), callback: v => v.toLocaleString() }, grid: { color: getCSS('--border') } },
+        x: { ticks: { color: getCSS('--text') }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// === 2. Por Municipio ===
+function populateSelectors() {
+  const munis = Object.keys(DATA.por_municipio);
+  const sel1 = document.getElementById('selMunicipio');
+  const sel2 = document.getElementById('selArrastre');
+  munis.forEach(m => {
+    sel1.add(new Option(m, m));
+    sel2.add(new Option(m, m));
+  });
+  sel2.add(new Option('TODOS', 'TODOS'));
+}
+
+function renderMunicipio() {
+  const muni = document.getElementById('selMunicipio').value;
+  const info = DATA.por_municipio[muni];
+  if (!info) return;
+
+  // Badge lider SE
+  document.getElementById('liderSE').innerHTML =
+    '<span class="lider-badge" style="background:' + info.lider_se.color + '">' +
+    'Líder SE: ' + info.lider_se.partido + ' (' + info.lider_se.votos.toLocaleString('es-CO') + ' votos)</span>';
+
+  // Chart candidatos CA
+  const ctx1 = document.getElementById('chartCandidatos').getContext('2d');
+  if (charts.cand) charts.cand.destroy();
+  charts.cand = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: info.top10_ca.map(x => x.candidato.length > 25 ? x.candidato.slice(0,23) + '…' : x.candidato),
+      datasets: [{
+        label: 'Votos CA',
+        data: info.top10_ca.map(x => x.votos),
+        backgroundColor: info.top10_ca.map(x => x.color),
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Top 10 Candidatos CA', color: getCSS('--text') },
+        tooltip: { callbacks: {
+          label: c => info.top10_ca[c.dataIndex].partido + ': ' + c.raw.toLocaleString('es-CO')
+        }}
+      },
+      scales: {
+        x: { beginAtZero: true, ticks: { color: getCSS('--text-muted') }, grid: { color: getCSS('--border') } },
+        y: { ticks: { color: getCSS('--text'), font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Chart partidos SE
+  const ctx2 = document.getElementById('chartPartidosSE').getContext('2d');
+  if (charts.pse) charts.pse.destroy();
+  charts.pse = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: info.top5_partidos_se.map(x => x.partido),
+      datasets: [{
+        data: info.top5_partidos_se.map(x => x.votos),
+        backgroundColor: info.top5_partidos_se.map(x => x.color),
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: 'Top 5 Partidos SE', color: getCSS('--text') },
+        legend: { position: 'bottom', labels: { color: getCSS('--text'), font: { size: 11 } } },
+        tooltip: { callbacks: { label: c => c.label + ': ' + c.raw.toLocaleString('es-CO') } }
+      }
+    }
+  });
+}
+
+// === 3. Arrastre ===
+function renderArrastre() {
+  const sel = document.getElementById('selArrastre').value;
+  const filtered = sel === 'TODOS' ? DATA.arrastre : DATA.arrastre.filter(x => x.municipio === sel);
+
+  const ctx = document.getElementById('chartArrastre').getContext('2d');
+  if (charts.arr) charts.arr.destroy();
+
+  // Plugin para linea de referencia en 1.0
+  const refLinePlugin = {
+    id: 'refLine',
+    afterDraw(chart) {
+      const yScale = chart.scales.y;
+      const y = yScale.getPixelForValue(1.0);
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.strokeStyle = getCSS('--ref-line');
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(chart.chartArea.left, y);
+      ctx.lineTo(chart.chartArea.right, y);
+      ctx.stroke();
+      // Etiqueta
+      ctx.fillStyle = getCSS('--ref-line');
+      ctx.font = '11px sans-serif';
+      ctx.fillText('Ref = 1.0', chart.chartArea.right - 55, y - 5);
+      ctx.restore();
+    }
+  };
+
+  charts.arr = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: filtered.map(x => x.zona.slice(-2) + (sel === 'TODOS' ? ' ' + x.municipio.slice(0,3) : '')),
+      datasets: [{
+        label: 'Ratio SE/CA',
+        data: filtered.map(x => x.ratio),
+        backgroundColor: filtered.map(x => x.ratio >= 1.0 ? '#007C34' : '#cc3333'),
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          title: c => filtered[c[0].dataIndex].municipio + ' — Zona ' + filtered[c[0].dataIndex].zona,
+          label: c => 'Ratio: ' + c.raw.toFixed(3) +
+            ' (CA: ' + filtered[c.dataIndex].votos_ca.toLocaleString() +
+            ', SE: ' + filtered[c.dataIndex].votos_se.toLocaleString() + ')'
+        }}
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: getCSS('--text-muted') },
+          grid: { color: getCSS('--border') },
+          title: { display: true, text: 'votos_SE_Verde / votos_CA_Verde', color: getCSS('--text-muted') }
+        },
+        x: { ticks: { color: getCSS('--text'), font: { size: 10 } }, grid: { display: false },
+             title: { display: true, text: 'Zona', color: getCSS('--text-muted') } }
+      }
+    },
+    plugins: [refLinePlugin]
+  });
+}
+
+// === Dark mode toggle (+3 bonus) ===
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('btnTheme').textContent = isDark ? 'Modo oscuro' : 'Modo claro';
+  // Re-renderizar para actualizar colores de ejes
+  renderComparativo();
+  renderMunicipio();
+  renderArrastre();
+}
+
+// === Exportar CSV (+2 bonus) ===
+function exportCSV(tipo) {
+  let csv = '', filename = '';
+  if (tipo === 'comparativo') {
+    csv = 'municipio,votos_ca\n' + DATA.comparativo.map(r => r.municipio + ',' + r.votos_ca).join('\n');
+    filename = 'comparativo_ca.csv';
+  } else if (tipo === 'municipio') {
+    const muni = document.getElementById('selMunicipio').value;
+    const info = DATA.por_municipio[muni];
+    csv = 'candidato,partido,votos\n' + info.top10_ca.map(r =>
+      '"' + r.candidato + '","' + r.partido + '",' + r.votos).join('\n');
+    filename = 'top10_' + muni.toLowerCase() + '.csv';
+  } else {
+    const sel = document.getElementById('selArrastre').value;
+    const filtered = sel === 'TODOS' ? DATA.arrastre : DATA.arrastre.filter(x => x.municipio === sel);
+    csv = 'municipio,zona,votos_ca,votos_se,ratio\n' + filtered.map(r =>
+      r.municipio + ',' + r.zona + ',' + r.votos_ca + ',' + r.votos_se + ',' + r.ratio).join('\n');
+    filename = 'arrastre_verde.csv';
+  }
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function getCSS(prop) {
+  return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+}
+</script>
+</body>
+</html>
