@@ -92,7 +92,7 @@
   .btn.active { background: var(--btn-active-bg); color: var(--btn-active-text); border-color: var(--btn-active-bg); }
 
   /* Contenido principal */
-  .main { max-width: 100%; margin: 0 auto; padding: 1rem 1.5rem 2rem; }
+  .main { max-width: 100%; margin: 0 auto; padding: 1rem 1.5rem 2rem; overflow-x: hidden; }
 
   /* KPI Cards */
   .kpi-row {
@@ -135,7 +135,7 @@
   }
 
   .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-  .flex-row > div { flex: 1; min-width: 300px; }
+  .flex-row > div { flex: 1; min-width: 0; }
 
   /* Grid 2 columnas para secciones */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
@@ -143,7 +143,7 @@
   /* Mapa */
   .map-section-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
   .map-container { display: flex; gap: 1rem; flex-wrap: wrap; }
-  #map { height: 520px; flex: 2; min-width: 400px; border-radius: 8px; border: 1px solid var(--border); z-index: 1; }
+  #map { height: 520px; flex: 2; min-width: 0; border-radius: 8px; border: 1px solid var(--border); z-index: 1; }
   .search-box {
     display: flex; align-items: center; gap: 0.4rem; background: var(--btn-bg);
     border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.7rem;
@@ -156,7 +156,7 @@
   }
   .search-box input::placeholder { color: var(--text-dim); }
   #map-panel {
-    flex: 1; min-width: 280px; max-width: 360px;
+    flex: 1; min-width: 0; max-width: 360px;
     background: var(--panel-bg); border: 1px solid var(--border);
     border-radius: 8px; padding: 1rem; max-height: 520px; overflow-y: auto;
   }
@@ -220,12 +220,38 @@
   @media (max-width: 900px) {
     .kpi-row { grid-template-columns: repeat(3, 1fr); }
     .grid-2 { grid-template-columns: 1fr; }
+    .flex-row { flex-direction: column; }
+    .flex-row > div { min-width: 0; }
   }
   @media (max-width: 700px) {
-    .kpi-row { grid-template-columns: repeat(2, 1fr); }
-    .flex-row, .map-container { flex-direction: column; }
-    #map-panel { max-width: 100%; }
-    .header { flex-direction: column; gap: 0.5rem; }
+    .main { padding: 0.5rem 0.75rem 1.5rem; }
+    .header { flex-direction: column; gap: 0.5rem; padding: 0.6rem 0.75rem; }
+    .header-left { flex-wrap: wrap; }
+    .header-title { font-size: 1.05rem; }
+    .header-sub { font-size: 0.7rem; }
+    .header-right { width: 100%; justify-content: space-between; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    .kpi-card { padding: 0.7rem 0.8rem; }
+    .kpi-card .kpi-value { font-size: 1.2rem; }
+    .kpi-card .kpi-label { font-size: 0.6rem; }
+    .map-container { flex-direction: column; }
+    #map { height: 350px; min-width: 0; }
+    #map-panel { max-width: 100%; max-height: none; }
+    .section { padding: 0.8rem; border-radius: 8px; }
+    .section-title { font-size: 0.9rem; }
+    .chart-wrap { max-height: 300px; }
+    .detail-header { flex-direction: column; align-items: flex-start; }
+    .arrastre-header { flex-direction: column; align-items: flex-start; }
+    .search-box { max-width: 100%; }
+    .hbar-label { width: 70px; font-size: 0.7rem; }
+    .legend { gap: 0.5rem; font-size: 0.7rem; }
+  }
+  @media (max-width: 400px) {
+    .kpi-row { grid-template-columns: 1fr; }
+    .header-icon { width: 30px; height: 30px; }
+    .header-icon svg { width: 18px; height: 18px; }
+    .corp-toggle .btn { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+    #map { height: 280px; }
   }
 </style>
 </head>
