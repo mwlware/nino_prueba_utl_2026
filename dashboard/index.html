@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
   /* === Dark-first design con CSS custom properties (+3 bonus) === */
   :root {
@@ -204,27 +205,39 @@
   .arrastre-stat { font-size: 0.78rem; color: var(--text-muted); }
   .arrastre-stat strong { color: var(--positive); }
 
+  /* Export section */
+  .export-section {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.4rem; margin-bottom: 1rem;
+  }
+  .export-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.8rem;
+  }
+  .export-card {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem; cursor: pointer; transition: all 0.2s; position: relative;
+    display: flex; flex-direction: column; gap: 0.4rem;
+  }
+  .export-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .export-card-header { display: flex; align-items: center; gap: 0.5rem; }
+  .export-card-icon {
+    width: 36px; height: 36px; border-radius: 8px; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .export-card-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; }
+  .export-card-title { font-size: 0.85rem; font-weight: 700; }
+  .export-card-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
+  .export-card-badge {
+    display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px;
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; align-self: flex-start;
+  }
+
   /* Footer */
   .footer {
-    background: var(--bg-card); border-top: 1px solid var(--border);
-    margin-top: 1.5rem; padding: 1.5rem 2rem; text-align: center;
+    text-align: center; padding: 1.2rem; color: var(--text-dim);
+    font-size: 0.72rem; border-top: 1px solid var(--border); margin-top: 0.5rem;
   }
-  .footer-text {
-    color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;
-  }
-  .footer-label {
-    color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase;
-    letter-spacing: 0.08em; margin-bottom: 0.5rem; font-weight: 600;
-  }
-  .csv-toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-  .csv-btn {
-    padding: 0.45rem 1rem; border: 1px solid var(--border); border-radius: 6px;
-    background: var(--btn-bg); color: var(--text); cursor: pointer;
-    font-size: 0.78rem; transition: all 0.2s; font-weight: 500;
-    display: flex; align-items: center; gap: 0.35rem;
-  }
-  .csv-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-card-alt); }
-  .csv-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
   /* === TABLET (<=1024px) === */
   @media (max-width: 1024px) {
@@ -280,11 +293,9 @@
     .btn { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
     .corp-toggle .btn { padding: 0.3rem 0.65rem; }
 
-    .footer { padding: 1rem 0.5rem; }
-    .footer-text { font-size: 0.68rem; }
-    .footer-label { font-size: 0.6rem; }
-    .csv-btn { font-size: 0.7rem; padding: 0.35rem 0.7rem; }
-    .csv-toolbar { gap: 0.35rem; }
+    .export-grid { grid-template-columns: 1fr; }
+    .export-section { padding: 0.8rem; }
+    .footer { padding: 0.8rem 0.5rem; font-size: 0.62rem; }
   }
 
   /* === MOVIL CHICO (<=480px) === */
@@ -458,28 +469,66 @@
   <div class="chart-wrap"><canvas id="chartArrastre"></canvas></div>
 </div>
 
+<!-- Exportar datos -->
+<div class="export-section">
+  <div class="section-title">Exportar datos</div>
+  <div class="section-sub">Descarga los datos del dashboard en formato Excel (.xlsx) con multiples hojas o CSV individual.</div>
+  <div class="export-grid">
+    <div class="export-card" onclick="exportExcel()">
+      <div class="export-card-header">
+        <div class="export-card-icon" style="background:#1D6F42">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="export-card-title">Reporte completo Excel</div>
+          <span class="export-card-badge" style="background:#1D6F42;color:#fff">Recomendado</span>
+        </div>
+      </div>
+      <div class="export-card-desc">5 hojas: Resumen, Comparativo, Top Candidatos CA, Partidos Senado y Arrastre Verde. Incluye formulas y datos calculados.</div>
+    </div>
+    <div class="export-card" onclick="exportCSV('comparativo')">
+      <div class="export-card-header">
+        <div class="export-card-icon" style="background:var(--accent)">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div>
+          <div class="export-card-title">CSV Comparativo</div>
+          <span class="export-card-badge" style="background:var(--border);color:var(--text-muted)">CSV</span>
+        </div>
+      </div>
+      <div class="export-card-desc">Votos CA por municipio, lider Senado y top 5 partidos SE.</div>
+    </div>
+    <div class="export-card" onclick="exportCSV('municipio')">
+      <div class="export-card-header">
+        <div class="export-card-icon" style="background:#E07B00">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div>
+          <div class="export-card-title">CSV Candidatos</div>
+          <span class="export-card-badge" style="background:var(--border);color:var(--text-muted)">CSV</span>
+        </div>
+      </div>
+      <div class="export-card-desc">Top 10 candidatos CA de los 4 municipios con ranking, partido y % del total.</div>
+    </div>
+    <div class="export-card" onclick="exportCSV('arrastre')">
+      <div class="export-card-header">
+        <div class="export-card-icon" style="background:#007C34">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div>
+          <div class="export-card-title">CSV Arrastre Verde</div>
+          <span class="export-card-badge" style="background:var(--border);color:var(--text-muted)">CSV</span>
+        </div>
+      </div>
+      <div class="export-card-desc">Ratio SE/CA por zona con diferencia absoluta, variacion % y clasificacion.</div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
 
-<!-- Footer -->
 <div class="footer">
-  <div class="footer-label">Exportar datos</div>
-  <div class="csv-toolbar">
-    <button class="csv-btn" onclick="exportCSV('comparativo')">
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Comparativo
-    </button>
-    <button class="csv-btn" onclick="exportCSV('municipio')">
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Municipio
-    </button>
-    <button class="csv-btn" onclick="exportCSV('arrastre')">
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Arrastre
-    </button>
-  </div>
-  <div class="footer-text" style="margin-top:1rem;margin-bottom:0">
-    Tablero de resultados electorales &middot; Preconteo Congreso 2026 &middot; Departamento de Boyaca &middot; Datos con fines de visualizacion.
-  </div>
+  Tablero de resultados electorales &middot; Preconteo Congreso 2026 &middot; Departamento de Boyaca &middot; Datos con fines de visualizacion.
 </div>
 
 <script>
@@ -1062,6 +1111,110 @@ function toggleTheme() {
 }
 
 // === Exportar CSV (+2 bonus) ===
+// === Exportar Excel multi-hoja ===
+function exportExcel() {
+  const wb = XLSX.utils.book_new();
+
+  // --- Hoja 1: Resumen ---
+  const mg = DATA.mapagan && DATA.mapagan[currentCorp] ? DATA.mapagan[currentCorp] : [];
+  const totalVotantes = mg.reduce((s, m) => s + (m.votant || 0), 0);
+  const totalVotosGan = mg.reduce((s, m) => s + (m.vot || 0), 0);
+  const counts = {};
+  mg.forEach(m => { counts[m.partido] = (counts[m.partido] || 0) + 1; });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  const resumen = [
+    ['REPORTE ELECTORAL - CONGRESO BOYACA 2026'],
+    ['Preconteo 8 de marzo de 2026'],
+    [],
+    ['INDICADOR', 'VALOR'],
+    ['Municipios', mg.length],
+    ['Total votantes', totalVotantes],
+    ['Votos a ganadores', totalVotosGan],
+    ['Partido lider', sorted[0] ? sorted[0][0] : ''],
+    ['Municipios del lider', sorted[0] ? sorted[0][1] : ''],
+    [],
+    ['PARTIDO GANADOR POR MUNICIPIOS'],
+    ['Partido', 'Municipios ganados'],
+    ...sorted.map(([p, n]) => [p, n]),
+    [],
+    ['DETALLE POR MUNICIPIO PRINCIPAL'],
+    ['Municipio', 'Codigo', 'Votos CA', 'Lider Senado', 'Votos Lider SE'],
+  ];
+  Object.entries(DATA.por_municipio).forEach(([muni, info]) => {
+    const comp = DATA.comparativo.find(c => c.municipio === muni);
+    resumen.push([muni, info.amb, comp ? comp.votos_ca : '', info.lider_se.partido, info.lider_se.votos]);
+  });
+  const ws1 = XLSX.utils.aoa_to_sheet(resumen);
+  ws1['!cols'] = [{ wch: 28 }, { wch: 20 }, { wch: 14 }, { wch: 20 }, { wch: 16 }];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Resumen');
+
+  // --- Hoja 2: Comparativo ---
+  const compRows = [['Municipio', 'Codigo AMB', 'Votos CA Total', 'Lider Senado', 'Votos Lider SE', 'Partido SE 1', 'Votos 1', 'Partido SE 2', 'Votos 2', 'Partido SE 3', 'Votos 3', 'Partido SE 4', 'Votos 4', 'Partido SE 5', 'Votos 5']];
+  Object.entries(DATA.por_municipio).forEach(([muni, info]) => {
+    const comp = DATA.comparativo.find(c => c.municipio === muni);
+    const row = [muni, info.amb, comp ? comp.votos_ca : '', info.lider_se.partido, info.lider_se.votos];
+    (info.top5_partidos_se || []).forEach(p => { row.push(p.partido, p.votos); });
+    compRows.push(row);
+  });
+  const ws2 = XLSX.utils.aoa_to_sheet(compRows);
+  ws2['!cols'] = [{ wch: 14 }, { wch: 12 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 20 }, { wch: 10 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Comparativo');
+
+  // --- Hoja 3: Top Candidatos CA ---
+  const candRows = [['Municipio', 'Ranking', 'Candidato', 'Partido', 'Votos', '% del Total CA']];
+  Object.entries(DATA.por_municipio).forEach(([muni, info]) => {
+    const comp = DATA.comparativo.find(c => c.municipio === muni);
+    const totalCA = comp ? comp.votos_ca : 0;
+    info.top10_ca.forEach((c, i) => {
+      const pct = totalCA > 0 ? Math.round((c.votos / totalCA) * 10000) / 100 : 0;
+      candRows.push([muni, i + 1, c.candidato, c.partido, c.votos, pct / 100]);
+    });
+  });
+  const ws3 = XLSX.utils.aoa_to_sheet(candRows);
+  ws3['!cols'] = [{ wch: 14 }, { wch: 8 }, { wch: 32 }, { wch: 20 }, { wch: 10 }, { wch: 14 }];
+  // Formato % en columna F
+  for (let i = 2; i <= candRows.length; i++) {
+    const cell = ws3['F' + i];
+    if (cell) cell.z = '0.00%';
+  }
+  XLSX.utils.book_append_sheet(wb, ws3, 'Top Candidatos CA');
+
+  // --- Hoja 4: Partidos Senado ---
+  const seRows = [['Municipio', 'Partido', 'Votos SE', '% del Total SE']];
+  Object.entries(DATA.por_municipio).forEach(([muni, info]) => {
+    const totalSE = (info.top5_partidos_se || []).reduce((s, p) => s + p.votos, 0);
+    (info.top5_partidos_se || []).forEach(p => {
+      const pct = totalSE > 0 ? Math.round((p.votos / totalSE) * 10000) / 100 : 0;
+      seRows.push([muni, p.partido, p.votos, pct / 100]);
+    });
+  });
+  const ws4 = XLSX.utils.aoa_to_sheet(seRows);
+  ws4['!cols'] = [{ wch: 14 }, { wch: 22 }, { wch: 12 }, { wch: 14 }];
+  for (let i = 2; i <= seRows.length; i++) {
+    const cell = ws4['D' + i];
+    if (cell) cell.z = '0.00%';
+  }
+  XLSX.utils.book_append_sheet(wb, ws4, 'Partidos Senado');
+
+  // --- Hoja 5: Arrastre Verde ---
+  const arrRows = [['Municipio', 'Zona', 'Votos CA Verde', 'Votos SE Verde', 'Diferencia', 'Variacion %', 'Ratio SE/CA', 'Tipo Arrastre']];
+  DATA.arrastre.forEach(r => {
+    const diff = r.votos_se - r.votos_ca;
+    const pctDiff = r.votos_ca > 0 ? (r.votos_se - r.votos_ca) / r.votos_ca : 0;
+    arrRows.push([r.municipio, r.zona, r.votos_ca, r.votos_se, diff, pctDiff, r.ratio, r.ratio >= 1 ? 'Positivo' : 'Negativo']);
+  });
+  const ws5 = XLSX.utils.aoa_to_sheet(arrRows);
+  ws5['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 13 }, { wch: 12 }, { wch: 14 }];
+  for (let i = 2; i <= arrRows.length; i++) {
+    const cell = ws5['F' + i];
+    if (cell) cell.z = '0.0%';
+  }
+  XLSX.utils.book_append_sheet(wb, ws5, 'Arrastre Verde');
+
+  XLSX.writeFile(wb, 'reporte_congreso_boyaca_2026.xlsx');
+}
+
 function exportCSV(tipo) {
   let csv = '', filename = '';
   if (tipo === 'comparativo') {
