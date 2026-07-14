@@ -206,18 +206,25 @@
 
   /* Footer */
   .footer {
-    text-align: center; padding: 1.5rem; color: var(--text-dim);
-    font-size: 0.75rem; border-top: 1px solid var(--border); margin-top: 1rem;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    margin-top: 1.5rem; padding: 1.5rem 2rem; text-align: center;
   }
-
-  /* CSV toolbar */
-  .csv-toolbar { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .footer-text {
+    color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;
+  }
+  .footer-label {
+    color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 0.5rem; font-weight: 600;
+  }
+  .csv-toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
   .csv-btn {
-    padding: 0.25rem 0.6rem; border: 1px solid var(--border); border-radius: 4px;
-    background: transparent; color: var(--text-muted); cursor: pointer;
-    font-size: 0.7rem; transition: all 0.2s;
+    padding: 0.45rem 1rem; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--btn-bg); color: var(--text); cursor: pointer;
+    font-size: 0.78rem; transition: all 0.2s; font-weight: 500;
+    display: flex; align-items: center; gap: 0.35rem;
   }
-  .csv-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .csv-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-card-alt); }
+  .csv-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
   /* === TABLET (<=1024px) === */
   @media (max-width: 1024px) {
@@ -273,8 +280,11 @@
     .btn { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
     .corp-toggle .btn { padding: 0.3rem 0.65rem; }
 
-    .footer { padding: 1rem 0.5rem; font-size: 0.65rem; }
-    .csv-btn { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
+    .footer { padding: 1rem 0.5rem; }
+    .footer-text { font-size: 0.68rem; }
+    .footer-label { font-size: 0.6rem; }
+    .csv-btn { font-size: 0.7rem; padding: 0.35rem 0.7rem; }
+    .csv-toolbar { gap: 0.35rem; }
   }
 
   /* === MOVIL CHICO (<=480px) === */
@@ -452,11 +462,23 @@
 
 <!-- Footer -->
 <div class="footer">
-  Tablero de resultados electorales &middot; Preconteo Congreso 2026 &middot; Departamento de Boyaca &middot; Datos con fines de visualizacion.
-  <div class="csv-toolbar" style="justify-content:center;margin-top:0.5rem">
-    <button class="csv-btn" onclick="exportCSV('comparativo')">CSV Comparativo</button>
-    <button class="csv-btn" onclick="exportCSV('municipio')">CSV Municipio</button>
-    <button class="csv-btn" onclick="exportCSV('arrastre')">CSV Arrastre</button>
+  <div class="footer-label">Exportar datos</div>
+  <div class="csv-toolbar">
+    <button class="csv-btn" onclick="exportCSV('comparativo')">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Comparativo
+    </button>
+    <button class="csv-btn" onclick="exportCSV('municipio')">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Municipio
+    </button>
+    <button class="csv-btn" onclick="exportCSV('arrastre')">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Arrastre
+    </button>
+  </div>
+  <div class="footer-text" style="margin-top:1rem;margin-bottom:0">
+    Tablero de resultados electorales &middot; Preconteo Congreso 2026 &middot; Departamento de Boyaca &middot; Datos con fines de visualizacion.
   </div>
 </div>
 
@@ -1043,20 +1065,49 @@ function toggleTheme() {
 function exportCSV(tipo) {
   let csv = '', filename = '';
   if (tipo === 'comparativo') {
-    csv = 'municipio,votos_ca\n' + DATA.comparativo.map(r => r.municipio + ',' + r.votos_ca).join('\n');
-    filename = 'comparativo_ca.csv';
+    // Todos los municipios: votos CA, lider SE, top 5 partidos SE
+    const rows = [];
+    Object.entries(DATA.por_municipio).forEach(([muni, info]) => {
+      const comp = DATA.comparativo.find(c => c.municipio === muni);
+      const votosCA = comp ? comp.votos_ca : '';
+      const liderSE = info.lider_se ? info.lider_se.partido : '';
+      const votosLiderSE = info.lider_se ? info.lider_se.votos : '';
+      // Top 5 partidos SE como columnas
+      const p = info.top5_partidos_se || [];
+      rows.push([
+        muni, info.amb, votosCA, liderSE, votosLiderSE,
+        ...p.map(x => x.partido + ':' + x.votos)
+      ].join(','));
+    });
+    csv = 'municipio,codigo_amb,votos_ca_total,lider_senado,votos_lider_se,partido_se_1,partido_se_2,partido_se_3,partido_se_4,partido_se_5\n' + rows.join('\n');
+    filename = 'comparativo_municipios.csv';
   } else if (tipo === 'municipio') {
-    const muni = document.getElementById('selMunicipio').value;
-    const info = DATA.por_municipio[muni];
-    csv = 'candidato,partido,votos\n' + info.top10_ca.map(r =>
-      '"' + r.candidato + '","' + r.partido + '",' + r.votos).join('\n');
-    filename = 'top10_' + muni.toLowerCase() + '.csv';
+    // Todos los municipios con top 10 candidatos CA
+    const rows = [];
+    Object.entries(DATA.por_municipio).forEach(([muni, info]) => {
+      const comp = DATA.comparativo.find(c => c.municipio === muni);
+      const totalCA = comp ? comp.votos_ca : 0;
+      info.top10_ca.forEach((c, i) => {
+        const pct = totalCA > 0 ? ((c.votos / totalCA) * 100).toFixed(2) : '0';
+        rows.push([
+          muni, i + 1, '"' + c.candidato + '"', '"' + c.partido + '"',
+          c.votos, pct + '%'
+        ].join(','));
+      });
+    });
+    csv = 'municipio,ranking,candidato,partido,votos,porcentaje_del_total_ca\n' + rows.join('\n');
+    filename = 'top10_candidatos_todos.csv';
   } else {
-    const sel = document.getElementById('selArrastre').value;
-    const filtered = sel === 'TODOS' ? DATA.arrastre : DATA.arrastre.filter(x => x.municipio === sel);
-    csv = 'municipio,zona,votos_ca,votos_se,ratio\n' + filtered.map(r =>
-      r.municipio + ',' + r.zona + ',' + r.votos_ca + ',' + r.votos_se + ',' + r.ratio).join('\n');
-    filename = 'arrastre_verde.csv';
+    // Arrastre con interpretacion
+    const filtered = DATA.arrastre;
+    const rows = filtered.map(r => {
+      const diff = r.votos_se - r.votos_ca;
+      const pctDiff = r.votos_ca > 0 ? (((r.votos_se - r.votos_ca) / r.votos_ca) * 100).toFixed(1) : '0';
+      const tipo = r.ratio >= 1.0 ? 'positivo' : 'negativo';
+      return [r.municipio, r.zona, r.votos_ca, r.votos_se, diff, pctDiff + '%', r.ratio, tipo].join(',');
+    });
+    csv = 'municipio,zona,votos_ca_verde,votos_se_verde,diferencia,variacion_pct,ratio_se_ca,tipo_arrastre\n' + rows.join('\n');
+    filename = 'arrastre_verde_completo.csv';
   }
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
