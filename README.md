@@ -37,7 +37,10 @@ python dashboard/export_data.py
 python viz/heatmap.py
 python viz/scatter.py
 
-# 5. Abrir dashboard en el navegador (datos embebidos, sin servidor)
+# 5. Generar reporte Excel (6 hojas con gráficas y formato condicional)
+python dashboard/generar_excel.py
+
+# 6. Abrir dashboard en el navegador (datos embebidos, sin servidor)
 #    Windows:
 start dashboard/index.html
 #    macOS:
@@ -158,6 +161,7 @@ recibiendo ~1.5% más votos en promedio.
 | Explicación atribución 3.3       | +2     | Documentado en Hallazgos punto 2: por qué top CA ≠ top atribución SE                  |
 | Dark mode (CSS custom properties)  | +3     | Toggle en dashboard con re-render de gráficos y tiles del mapa                          |
 | Exportar CSV                       | +2     | 3 botones: comparativo, municipio, arrastre                                              |
+| Reporte Excel (openpyxl)           | extra  | 6 hojas con gráficas, formato condicional y estilos (`generar_excel.py`)                |
 | Mapa coroplético 123 municipios   | extra  | Mapa Leaflet de todo Boyacá con toggle CA/SE, búsqueda, panel de detalle y leyenda     |
 | Scraper extendido a 123 municipios | +3     | `export_data.py` descarga y mapea los 123 municipios del departamento vía `mapagan` |
 | Heatmap anotado                    | —     | Top 8 candidatos × 4 municipios, % por municipio                                        |
