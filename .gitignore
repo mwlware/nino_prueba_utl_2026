@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+
+# Archivos internos de trabajo
+.claude/
+CLAUDE.md
+PLAN_DE_TRABAJO.md
+Prueba Analista de Datos.md
+resultados_boyaca_congreso2026.md
+tmp/
+
+# Demos (no son parte de la entrega)
+dashboard/DemoCamara.png
+dashboard/DemoSenado.png
+
+# GeoJSON fuente (ya embebido en index.html)
+maps/
+
+# OS
+Thumbs.db
+.DS_Store

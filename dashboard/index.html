@@ -1,165 +1,374 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Congreso Boyacá 2026</title>
+<title>Dashboard Congreso Boyaca 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  /* === Dark mode con CSS custom properties (+3 bonus) === */
+  /* === Dark-first design con CSS custom properties (+3 bonus) === */
   :root {
-    --bg: #ffffff;
-    --bg-card: #f8f9fa;
+    --bg: #0f1923;
+    --bg-card: #152232;
+    --bg-card-alt: #1a2d42;
+    --text: #e0e6ed;
+    --text-muted: #8899aa;
+    --text-dim: #5a6a7a;
+    --border: #233345;
+    --shadow: rgba(0,0,0,0.4);
+    --btn-bg: #1a2d42;
+    --btn-text: #c0cdd8;
+    --btn-active-bg: #2196F3;
+    --btn-active-text: #fff;
+    --ref-line: rgba(0,200,120,0.7);
+    --panel-bg: #152232;
+    --header-bg: #152232;
+    --kpi-bg: #152232;
+    --accent: #2196F3;
+    --positive: #00c853;
+    --negative: #ff5252;
+    --select-bg: #1a2d42;
+  }
+  [data-theme="light"] {
+    --bg: #f0f2f5;
+    --bg-card: #ffffff;
+    --bg-card-alt: #f8f9fa;
     --text: #1a1a2e;
-    --text-muted: #555;
-    --border: #dee2e6;
+    --text-muted: #666;
+    --text-dim: #999;
+    --border: #e0e0e0;
     --shadow: rgba(0,0,0,0.08);
     --btn-bg: #e9ecef;
     --btn-text: #333;
-    --ref-line: rgba(255,0,0,0.5);
+    --btn-active-bg: #2196F3;
+    --btn-active-text: #fff;
+    --ref-line: rgba(0,150,80,0.6);
     --panel-bg: #ffffff;
-  }
-  [data-theme="dark"] {
-    --bg: #1a1a2e;
-    --bg-card: #16213e;
-    --text: #e0e0e0;
-    --text-muted: #aaa;
-    --border: #333;
-    --shadow: rgba(0,0,0,0.3);
-    --btn-bg: #0f3460;
-    --btn-text: #e0e0e0;
-    --ref-line: rgba(255,80,80,0.7);
-    --panel-bg: #16213e;
+    --header-bg: #ffffff;
+    --kpi-bg: #ffffff;
+    --accent: #2196F3;
+    --positive: #007C34;
+    --negative: #cc3333;
+    --select-bg: #fff;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg); color: var(--text);
-    line-height: 1.5; padding: 1rem; transition: background 0.3s, color 0.3s;
+    line-height: 1.5; padding: 0; transition: background 0.3s, color 0.3s;
+    min-height: 100vh;
   }
-  header {
-    text-align: center; padding: 1.5rem 0 1rem;
-    border-bottom: 2px solid var(--border); margin-bottom: 1.5rem;
+
+  /* Header */
+  .header {
+    background: var(--header-bg); border-bottom: 1px solid var(--border);
+    padding: 0.8rem 1.5rem; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
   }
-  header h1 { font-size: 1.6rem; }
-  header p { color: var(--text-muted); font-size: 0.9rem; }
-  .toolbar {
-    display: flex; justify-content: flex-end; gap: 0.5rem;
-    margin-bottom: 1rem; flex-wrap: wrap;
+  .header-left { display: flex; align-items: center; gap: 0.75rem; }
+  .header-icon {
+    width: 38px; height: 38px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
   }
+  .header-icon svg { width: 22px; height: 22px; fill: #fff; }
+  .header-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header-badge {
+    display: inline-block; padding: 0.15rem 0.55rem; border-radius: 4px;
+    background: var(--positive); color: #fff; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; margin-left: 0.5rem; vertical-align: middle;
+  }
+  .header-sub { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.1rem; }
+  .header-right { display: flex; align-items: center; gap: 0.5rem; }
+
+  /* Botones */
   .btn {
     padding: 0.4rem 0.9rem; border: 1px solid var(--border); border-radius: 6px;
     background: var(--btn-bg); color: var(--btn-text); cursor: pointer;
-    font-size: 0.85rem; transition: all 0.2s;
+    font-size: 0.8rem; transition: all 0.2s; font-weight: 500;
   }
-  .btn:hover { opacity: 0.8; }
-  .btn.active { background: #1E477D; color: #fff; border-color: #1E477D; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.active { background: var(--btn-active-bg); color: var(--btn-active-text); border-color: var(--btn-active-bg); }
+
+  /* Contenido principal */
+  .main { max-width: 100%; margin: 0 auto; padding: 1rem 1.5rem 2rem; }
+
+  /* KPI Cards */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .kpi-card {
+    background: var(--kpi-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1rem 1.1rem; position: relative;
+  }
+  .kpi-card .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+  .kpi-card .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 600; }
+  .kpi-card .kpi-icon { color: var(--text-dim); }
+  .kpi-card .kpi-icon svg { width: 18px; height: 18px; stroke: var(--text-dim); fill: none; stroke-width: 1.5; }
+  .kpi-card .kpi-value { font-size: 1.6rem; font-weight: 700; font-family: 'Consolas', 'Monaco', monospace; letter-spacing: -0.02em; }
+  .kpi-card .kpi-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
+  .kpi-card .kpi-value.green { color: var(--positive); }
+
+  /* Secciones */
   .section {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 1.2rem; margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px var(--shadow);
+    border-radius: 10px; padding: 1.2rem 1.4rem; margin-bottom: 1rem;
   }
-  .section h2 {
-    font-size: 1.15rem; margin-bottom: 0.8rem;
-    padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
-  }
+  .section-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.15rem; }
+  .section-sub { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem; }
+
   .chart-wrap { position: relative; max-height: 420px; }
+
   select {
-    padding: 0.4rem 0.7rem; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--btn-bg); color: var(--btn-text); font-size: 0.85rem;
-    margin-bottom: 0.8rem;
+    padding: 0.45rem 0.8rem; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--select-bg); color: var(--text); font-size: 0.85rem;
+    margin-bottom: 0.8rem; outline: none; cursor: pointer;
+    appearance: auto;
   }
+  select:focus { border-color: var(--accent); }
+
   .lider-badge {
-    display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px;
-    color: #fff; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.8rem;
+    display: inline-block; padding: 0.3rem 0.85rem; border-radius: 20px;
+    color: #fff; font-weight: 600; font-size: 0.82rem;
   }
+
   .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; }
   .flex-row > div { flex: 1; min-width: 300px; }
 
+  /* Grid 2 columnas para secciones */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+
   /* Mapa */
+  .map-section-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
   .map-container { display: flex; gap: 1rem; flex-wrap: wrap; }
   #map { height: 520px; flex: 2; min-width: 400px; border-radius: 8px; border: 1px solid var(--border); z-index: 1; }
+  .search-box {
+    display: flex; align-items: center; gap: 0.4rem; background: var(--btn-bg);
+    border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.7rem;
+    margin-bottom: 0.6rem; max-width: 280px;
+  }
+  .search-box svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 2; flex-shrink: 0; }
+  .search-box input {
+    background: transparent; border: none; color: var(--text); font-size: 0.82rem;
+    outline: none; width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text-dim); }
   #map-panel {
     flex: 1; min-width: 280px; max-width: 360px;
     background: var(--panel-bg); border: 1px solid var(--border);
     border-radius: 8px; padding: 1rem; max-height: 520px; overflow-y: auto;
   }
-  #map-panel h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
-  #map-panel .stat { display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+  #map-panel h3 { font-size: 1.05rem; margin-bottom: 0.5rem; font-weight: 700; }
+  #map-panel .panel-corp { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+  #map-panel .winner-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.35rem 0.6rem; border-radius: 6px; margin-bottom: 0.6rem;
+    font-size: 0.85rem; font-weight: 600;
+  }
+  #map-panel .stat { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
   #map-panel .stat:last-child { border-bottom: none; }
   #map-panel .stat-label { color: var(--text-muted); }
+  #map-panel .stat-value { font-weight: 600; font-family: 'Consolas', monospace; }
+  #map-panel .panel-note { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.8rem; line-height: 1.4; }
   #map-panel .detail-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; }
   #map-panel .detail-table th, #map-panel .detail-table td { padding: 0.3rem 0.4rem; text-align: left; border-bottom: 1px solid var(--border); }
   #map-panel .detail-table th { color: var(--text-muted); font-weight: 600; }
-  .corp-toggle { display: flex; gap: 0; margin-bottom: 0.8rem; }
+
+  .corp-toggle { display: flex; gap: 0; }
   .corp-toggle .btn { border-radius: 0; }
   .corp-toggle .btn:first-child { border-radius: 6px 0 0 6px; }
   .corp-toggle .btn:last-child { border-radius: 0 6px 6px 0; }
-  .legend { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.6rem; font-size: 0.82rem; }
-  .legend-item { display: flex; align-items: center; gap: 0.3rem; }
-  .legend-dot { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #999; }
 
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.8rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.35rem; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+  .legend-count { font-weight: 600; color: var(--text); }
+
+  /* Barra horizontal para partidos ganadores */
+  .hbar-chart { display: flex; flex-direction: column; gap: 0.7rem; padding: 0.5rem 0; }
+  .hbar-row { display: flex; align-items: center; gap: 0.6rem; }
+  .hbar-label { width: 90px; text-align: right; font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0; }
+  .hbar-track { flex: 1; height: 22px; background: var(--bg); border-radius: 4px; overflow: hidden; position: relative; }
+  .hbar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .hbar-value { font-size: 0.82rem; font-weight: 600; width: 36px; flex-shrink: 0; }
+
+  /* Detalle municipio header */
+  .detail-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem; }
+
+  /* Arrastre info */
+  .arrastre-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem; }
+  .arrastre-stat { font-size: 0.78rem; color: var(--text-muted); }
+  .arrastre-stat strong { color: var(--positive); }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 1.5rem; color: var(--text-dim);
+    font-size: 0.75rem; border-top: 1px solid var(--border); margin-top: 1rem;
+  }
+
+  /* CSV toolbar */
+  .csv-toolbar { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .csv-btn {
+    padding: 0.25rem 0.6rem; border: 1px solid var(--border); border-radius: 4px;
+    background: transparent; color: var(--text-muted); cursor: pointer;
+    font-size: 0.7rem; transition: all 0.2s;
+  }
+  .csv-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
   @media (max-width: 700px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .flex-row, .map-container { flex-direction: column; }
     #map-panel { max-width: 100%; }
+    .header { flex-direction: column; gap: 0.5rem; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Dashboard Congreso Boyacá 2026</h1>
-  <p>Resultados preconteo — Cámara y Senado — 123 municipios de Boyacá</p>
-</header>
-
-<div class="toolbar">
-  <button class="btn" id="btnTheme" onclick="toggleTheme()">Modo oscuro</button>
-  <button class="btn" onclick="exportCSV('comparativo')">CSV Comparativo</button>
-  <button class="btn" onclick="exportCSV('municipio')">CSV Municipio</button>
-  <button class="btn" onclick="exportCSV('arrastre')">CSV Arrastre</button>
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+    </div>
+    <div>
+      <div class="header-title">Congreso Boyaca 2026 <span class="header-badge">Preconteo</span></div>
+      <div class="header-sub">Resultados de Camara y Senado en los 123 municipios del departamento.</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="corp-toggle">
+      <button class="btn active" id="btnSE" onclick="setCorp('SE')">Senado</button>
+      <button class="btn" id="btnCA" onclick="setCorp('CA')">Camara</button>
+    </div>
+    <button class="btn" id="btnTheme" onclick="toggleTheme()">
+      <span id="themeIcon">&#9788;</span> Claro
+    </button>
+  </div>
 </div>
 
-<!-- Sección 0: Mapa coroplético -->
+<div class="main">
+
+<!-- KPI Cards -->
+<div class="kpi-row" id="kpiRow">
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-label">Municipios</span>
+      <span class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span>
+    </div>
+    <div class="kpi-value" id="kpiMunicipios">123</div>
+    <div class="kpi-sub">Cobertura total de Boyaca</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-label">Votantes</span>
+      <span class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/></svg></span>
+    </div>
+    <div class="kpi-value" id="kpiVotantes">--</div>
+    <div class="kpi-sub" id="kpiVotantesSub">Registrados</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-label">Votos a ganadores</span>
+      <span class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></span>
+    </div>
+    <div class="kpi-value" id="kpiVotosGanadores">--</div>
+    <div class="kpi-sub">Sumatoria del 1er lugar por municipio</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-label">Partido lider</span>
+      <span class="kpi-icon green"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01z"/></svg></span>
+    </div>
+    <div class="kpi-value green" id="kpiPartidoLider" style="font-size:1.15rem;font-family:inherit">--</div>
+    <div class="kpi-sub" id="kpiPartidoLiderSub">--</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-label">Escrutado</span>
+      <span class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span>
+    </div>
+    <div class="kpi-value" id="kpiEscrutado">--</div>
+    <div class="kpi-sub">Promedio de mesas escrutadas</div>
+  </div>
+</div>
+
+<!-- Mapa -->
 <div class="section">
-  <h2>Mapa de Boyacá — Partido ganador por municipio</h2>
-  <div class="corp-toggle">
-    <button class="btn active" id="btnCA" onclick="setCorp('CA')">Cámara (CA)</button>
-    <button class="btn" id="btnSE" onclick="setCorp('SE')">Senado (SE)</button>
+  <div class="section-title" id="mapTitle">Mapa &middot; Partido ganador por municipio</div>
+  <div class="section-sub" id="mapSub">Senado &mdash; pasa el cursor o haz clic en un municipio.</div>
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;flex-wrap:wrap">
+    <div class="search-box" style="margin-bottom:0">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchMuni" placeholder="Buscar municipio..." oninput="searchMunicipio(this.value)">
+    </div>
+    <button id="btnClearFilter" class="btn" onclick="clearFilter()" style="display:none;font-size:0.75rem;padding:0.3rem 0.7rem;background:#cc3333;color:#fff;border-color:#cc3333">&#10005; Limpiar filtro</button>
   </div>
   <div class="map-container">
     <div id="map"></div>
     <div id="map-panel">
       <h3>Selecciona un municipio</h3>
-      <p style="color:var(--text-muted);font-size:0.88rem">Haz clic en el mapa para ver el detalle.</p>
+      <p style="color:var(--text-muted);font-size:0.85rem">Haz clic en el mapa para ver el detalle.</p>
     </div>
   </div>
   <div class="legend" id="legend"></div>
 </div>
 
-<!-- Sección 1: Comparativo -->
-<div class="section">
-  <h2>1. Comparativo — Votos CA totales por municipio</h2>
-  <div class="chart-wrap"><canvas id="chartComparativo"></canvas></div>
+<!-- Municipios ganados + Comparativo -->
+<div class="grid-2">
+  <div class="section">
+    <div class="section-title" id="hbarTitle">Municipios ganados por partido &middot; Senado</div>
+    <div class="section-sub">Numero de municipios donde cada partido quedo primero.</div>
+    <div class="hbar-chart" id="hbarPartidos"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">Comparativo &middot; Votos Camara</div>
+    <div class="section-sub">Total de votos a Camara en los municipios principales.</div>
+    <div class="chart-wrap"><canvas id="chartComparativo"></canvas></div>
+  </div>
 </div>
 
-<!-- Sección 2: Por Municipio -->
+<!-- Detalle por municipio -->
 <div class="section">
-  <h2>2. Por Municipio — Top 10 candidatos CA + partido líder SE</h2>
-  <select id="selMunicipio" onchange="renderMunicipio()"></select>
-  <div id="liderSE"></div>
+  <div class="section-title">Detalle por municipio</div>
+  <div class="section-sub">Top 10 candidatos a Camara y distribucion de partidos al Senado.</div>
+  <div class="detail-header">
+    <select id="selMunicipio" onchange="renderMunicipio()"></select>
+    <div id="liderSE"></div>
+  </div>
   <div class="flex-row">
     <div><div class="chart-wrap"><canvas id="chartCandidatos"></canvas></div></div>
     <div><div class="chart-wrap"><canvas id="chartPartidosSE"></canvas></div></div>
   </div>
 </div>
 
-<!-- Sección 3: Arrastre -->
+<!-- Arrastre -->
 <div class="section">
-  <h2>3. Arrastre — Ratio Verde CA→SE por zona</h2>
-  <select id="selArrastre" onchange="renderArrastre()"></select>
+  <div class="section-title">Arrastre Verde &middot; Ratio Camara &rarr; Senado</div>
+  <div class="section-sub">Relacion entre votos al Senado y a Camara de la Alianza Verde por zona. Un valor &ge; 1 indica que la lista al Senado arrastro mas votos que los candidatos a Camara.</div>
+  <div class="arrastre-header">
+    <select id="selArrastre" onchange="renderArrastre()"></select>
+    <div class="arrastre-stat" id="arrasteStat"></div>
+  </div>
   <div class="chart-wrap"><canvas id="chartArrastre"></canvas></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- Footer -->
+<div class="footer">
+  Tablero de resultados electorales &middot; Preconteo Congreso 2026 &middot; Departamento de Boyaca &middot; Datos con fines de visualizacion.
+  <div class="csv-toolbar" style="justify-content:center;margin-top:0.5rem">
+    <button class="csv-btn" onclick="exportCSV('comparativo')">CSV Comparativo</button>
+    <button class="csv-btn" onclick="exportCSV('municipio')">CSV Municipio</button>
+    <button class="csv-btn" onclick="exportCSV('arrastre')">CSV Arrastre</button>
+  </div>
 </div>
 
 <script>
@@ -167,13 +376,11 @@ let DATA = null;
 let charts = {};
 let leafletMap = null;
 let geoLayer = null;
-let currentCorp = 'CA';
+let currentCorp = 'SE';
 let selectedFeature = null;
 
-// Los 4 municipios con detalle en BD
 const DETAIL_AMBS = ['0700001','0700079','0700277','0700181'];
 
-// Cargar datos (embebidos o fetch)
 function loadData() {
   if (typeof EMBEDDED_DATA !== 'undefined') {
     DATA = EMBEDDED_DATA;
@@ -187,32 +394,117 @@ function loadData() {
 }
 
 function init() {
+  renderKPIs();
   initMap();
+  renderHbar();
   renderComparativo();
   populateSelectors();
   renderMunicipio();
   renderArrastre();
 }
 
-// === MAPA COROPLÉTICO ===
+function fmtNum(n) { return n.toLocaleString('es-CO'); }
+
+// === KPI Cards ===
+function renderKPIs() {
+  const mg = DATA.mapagan && DATA.mapagan[currentCorp] ? DATA.mapagan[currentCorp] : [];
+  const nMunis = mg.length;
+  const totalVotantes = mg.reduce((s, m) => s + (m.votant || 0), 0);
+  const totalVotosGanadores = mg.reduce((s, m) => s + (m.vot || 0), 0);
+
+  // Contar por partido
+  const counts = {};
+  mg.forEach(m => { counts[m.partido] = (counts[m.partido] || 0) + 1; });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const lider = sorted[0] || ['--', 0];
+
+  // Escrutado promedio
+  const pcts = mg.map(m => parseFloat((m.pmesesc || '0').replace('%', '').replace(',', '.')));
+  const avgEsc = pcts.length ? (pcts.reduce((a, b) => a + b, 0) / pcts.length) : 0;
+
+  document.getElementById('kpiMunicipios').textContent = nMunis;
+  document.getElementById('kpiVotantes').textContent = fmtNum(totalVotantes);
+  document.getElementById('kpiVotantesSub').textContent = 'Registrados \u00b7 ' + (currentCorp === 'CA' ? 'Camara' : 'Senado');
+  document.getElementById('kpiVotosGanadores').textContent = fmtNum(totalVotosGanadores);
+  document.getElementById('kpiPartidoLider').textContent = lider[0];
+  document.getElementById('kpiPartidoLiderSub').textContent = 'Gana en ' + lider[1] + ' municipios';
+  document.getElementById('kpiEscrutado').textContent = avgEsc.toFixed(1) + '%';
+}
+
+// === MAPA COROPLETICO ===
 function normalizar(s) {
   return s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
 function initMap() {
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const tileUrl = isDark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
   leafletMap = L.map('map', { zoomSnap: 0.25 }).setView([5.8, -73.3], 7.75);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap, &copy; CARTO', maxZoom: 13
+  L.tileLayer(tileUrl, {
+    attribution: '&copy; <a href="https://leafletjs.com">Leaflet</a> | &copy; OpenStreetMap, &copy; CARTO', maxZoom: 13
   }).addTo(leafletMap);
   renderMap();
   renderLegend();
+  showDefaultPanel();
+}
+
+function clearFilter() {
+  selectedFeature = null;
+  document.getElementById('searchMuni').value = '';
+  document.getElementById('btnClearFilter').style.display = 'none';
+  renderMap();
+  showDefaultPanel();
+  leafletMap.setView([5.8, -73.3], 7.75);
+}
+
+function showDefaultPanel() {
+  const panel = document.getElementById('map-panel');
+  const mg = DATA.mapagan && DATA.mapagan[currentCorp] ? DATA.mapagan[currentCorp] : [];
+  const corpLabel = currentCorp === 'CA' ? 'Camara' : 'Senado';
+  const nMunis = mg.length;
+  const totalVotantes = mg.reduce((s, m) => s + (m.votant || 0), 0);
+  const totalVotos = mg.reduce((s, m) => s + (m.vot || 0), 0);
+  const totalMesas = mg.reduce((s, m) => s + (m.mesesc || 0), 0);
+
+  // Top 5 partidos por municipios ganados
+  const counts = {};
+  const colors = {};
+  mg.forEach(m => {
+    counts[m.partido] = (counts[m.partido] || 0) + 1;
+    colors[m.partido] = m.color;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  let html = `<h3>Boyaca &middot; ${corpLabel}</h3>`;
+  html += `<div class="panel-corp">Resumen departamental &middot; ${nMunis} municipios</div>`;
+
+  html += `<div class="stat"><span class="stat-label">Total votantes</span><span class="stat-value">${fmtNum(totalVotantes)}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Votos a ganadores</span><span class="stat-value">${fmtNum(totalVotos)}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Total mesas</span><span class="stat-value">${fmtNum(totalMesas)}</span></div>`;
+
+  // Participacion
+  if (totalVotantes > 0) {
+    const cuota = ((totalVotos / totalVotantes) * 100).toFixed(1);
+    html += `<div class="stat"><span class="stat-label">Cuota ganadores</span><span class="stat-value">${cuota}%</span></div>`;
+  }
+
+  html += `<h3 style="margin-top:0.8rem">Top partidos ganadores</h3>`;
+  html += `<table class="detail-table"><tr><th>Partido</th><th>Municipios</th></tr>`;
+  sorted.forEach(([name, n]) => {
+    html += `<tr><td style="color:${colors[name]};font-weight:600">${name}</td><td>${n}</td></tr>`;
+  });
+  html += `</table>`;
+
+  html += `<div class="panel-note" style="margin-top:0.6rem">Haz clic en un municipio del mapa para ver su detalle.</div>`;
+  panel.innerHTML = html;
 }
 
 function getMapaganIndex(corp) {
   const idx = {};
   if (!DATA.mapagan || !DATA.mapagan[corp]) return idx;
   DATA.mapagan[corp].forEach(m => {
-    // Indexar por nombre normalizado
     let name = m.nombre;
     const alias = DATA.alias_nombre || {};
     if (alias[name]) name = alias[name];
@@ -229,11 +521,11 @@ function renderMap() {
     style: function(feature) {
       const name = normalizar(feature.properties.name);
       const m = idx[name];
-      const fillColor = m ? m.color : '#ccc';
+      const fillColor = m ? m.color : '#444';
       const isSelected = selectedFeature && normalizar(selectedFeature.properties.name) === name;
       return {
-        fillColor: fillColor, fillOpacity: isSelected ? 0.9 : 0.7,
-        color: isSelected ? '#222' : '#fff', weight: isSelected ? 2.5 : 1, opacity: 1
+        fillColor: fillColor, fillOpacity: isSelected ? 0.95 : 0.75,
+        color: isSelected ? '#fff' : 'rgba(255,255,255,0.3)', weight: isSelected ? 2.5 : 0.8, opacity: 1
       };
     },
     onEachFeature: function(feature, layer) {
@@ -245,10 +537,10 @@ function renderMap() {
       layer.on('mouseover', function(e) {
         const name = normalizar(feature.properties.name);
         const m = idx[name];
-        const tip = m ? `${m.nombre}: ${m.partido} (${m.vot.toLocaleString('es-CO')} votos)` : feature.properties.name;
+        const tip = m ? `${m.nombre}: ${m.partido} (${fmtNum(m.vot)} votos)` : feature.properties.name;
         layer.bindTooltip(tip, { sticky: true }).openTooltip(e.latlng);
         if (selectedFeature !== feature) {
-          e.target.setStyle({ weight: 2, color: '#333' });
+          e.target.setStyle({ weight: 2, color: '#fff' });
         }
       });
       layer.on('mouseout', function(e) {
@@ -261,37 +553,67 @@ function renderMap() {
   }).addTo(leafletMap);
 }
 
+function searchMunicipio(query) {
+  if (!query || query.length < 2 || !geoLayer) return;
+  const q = normalizar(query);
+  const idx = getMapaganIndex(currentCorp);
+  geoLayer.eachLayer(layer => {
+    const name = normalizar(layer.feature.properties.name);
+    if (name.includes(q)) {
+      selectedFeature = layer.feature;
+      renderMap();
+      showPanel(layer.feature);
+      leafletMap.fitBounds(layer.getBounds(), { maxZoom: 10 });
+      return;
+    }
+  });
+}
+
 function showPanel(feature) {
   const panel = document.getElementById('map-panel');
   const name = normalizar(feature.properties.name);
   const idx = getMapaganIndex(currentCorp);
   const m = idx[name];
 
+  document.getElementById('btnClearFilter').style.display = '';
+
   if (!m) {
-    panel.innerHTML = `<h3>${feature.properties.name}</h3><p>Sin datos</p>`;
+    panel.innerHTML = `<h3>${feature.properties.name}</h3><p style="color:var(--text-muted)">Sin datos</p>`;
     return;
   }
 
-  // Buscar amb en los 4 municipios detallados
   const isDetail = DETAIL_AMBS.includes(m.amb);
+  const corpLabel = currentCorp === 'CA' ? 'Camara' : 'Senado';
 
   let html = `<h3>${m.nombre}</h3>`;
-  html += `<div class="stat"><span class="stat-label">Corporación</span><span>${currentCorp === 'CA' ? 'Cámara' : 'Senado'}</span></div>`;
-  html += `<div class="stat"><span class="stat-label">Ganador</span><span style="color:${m.color};font-weight:700">${m.partido}</span></div>`;
-  html += `<div class="stat"><span class="stat-label">Votos ganador</span><span>${m.vot.toLocaleString('es-CO')}</span></div>`;
-  html += `<div class="stat"><span class="stat-label">Votantes</span><span>${m.votant.toLocaleString('es-CO')}</span></div>`;
-  html += `<div class="stat"><span class="stat-label">Mesas escrutadas</span><span>${m.mesesc}</span></div>`;
-  html += `<div class="stat"><span class="stat-label">% escrutado</span><span>${m.pmesesc}</span></div>`;
+  html += `<div class="panel-corp">${corpLabel} &middot; cod. ${m.amb}</div>`;
 
-  if (isDetail) {
-    // Buscar en por_municipio (top 10 CA + top 5 SE)
+  // Barra del ganador
+  const bgColor = m.color + '22';
+  html += `<div class="winner-bar" style="background:${bgColor};border-left:3px solid ${m.color}">
+    <span style="color:${m.color}">${m.partido}</span>
+    <span class="stat-value">${fmtNum(m.vot)}</span>
+  </div>`;
+
+  html += `<div class="stat"><span class="stat-label">Votantes</span><span class="stat-value">${fmtNum(m.votant)}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Mesas escrutadas</span><span class="stat-value">${m.mesesc}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">% escrutado</span><span class="stat-value">${m.pmesesc}</span></div>`;
+
+  if (m.votant > 0) {
+    const cuota = ((m.vot / m.votant) * 100).toFixed(1);
+    html += `<div class="stat"><span class="stat-label">Cuota ganador</span><span class="stat-value">${cuota}%</span></div>`;
+  }
+
+  if (!isDetail) {
+    html += `<div class="panel-note">El detalle de candidatos solo esta disponible para 4 municipios principales. Este municipio muestra unicamente el resultado del ganador.</div>`;
+  } else {
     const muniData = DATA.por_municipio[m.nombre];
     if (muniData) {
       if (currentCorp === 'CA' && muniData.top10_ca) {
         html += `<h3 style="margin-top:0.8rem">Top 10 Candidatos CA</h3>`;
         html += `<table class="detail-table"><tr><th>Candidato</th><th>Partido</th><th>Votos</th></tr>`;
         muniData.top10_ca.forEach(c => {
-          html += `<tr><td>${c.candidato}</td><td style="color:${c.color}">${c.partido}</td><td>${c.votos.toLocaleString('es-CO')}</td></tr>`;
+          html += `<tr><td>${c.candidato}</td><td style="color:${c.color}">${c.partido}</td><td>${fmtNum(c.votos)}</td></tr>`;
         });
         html += `</table>`;
       }
@@ -299,17 +621,16 @@ function showPanel(feature) {
         html += `<h3 style="margin-top:0.8rem">Top 5 Partidos SE</h3>`;
         html += `<table class="detail-table"><tr><th>Partido</th><th>Votos</th></tr>`;
         muniData.top5_partidos_se.forEach(p => {
-          html += `<tr><td style="color:${p.color}">${p.partido}</td><td>${p.votos.toLocaleString('es-CO')}</td></tr>`;
+          html += `<tr><td style="color:${p.color}">${p.partido}</td><td>${fmtNum(p.votos)}</td></tr>`;
         });
         html += `</table>`;
       }
-      // Arrastre Verde para los 4
       const arrastres = DATA.arrastre.filter(a => a.municipio === m.nombre);
       if (arrastres.length > 0) {
         html += `<h3 style="margin-top:0.8rem">Arrastre Verde</h3>`;
         html += `<table class="detail-table"><tr><th>Zona</th><th>CA</th><th>SE</th><th>Ratio</th></tr>`;
         arrastres.forEach(a => {
-          const color = a.ratio >= 1 ? '#007C34' : '#cc3333';
+          const color = a.ratio >= 1 ? '#00c853' : '#ff5252';
           html += `<tr><td>${a.zona.slice(-2)}</td><td>${a.votos_ca}</td><td>${a.votos_se}</td><td style="color:${color};font-weight:600">${a.ratio.toFixed(3)}</td></tr>`;
         });
         html += `</table>`;
@@ -324,29 +645,106 @@ function setCorp(corp) {
   currentCorp = corp;
   document.getElementById('btnCA').classList.toggle('active', corp === 'CA');
   document.getElementById('btnSE').classList.toggle('active', corp === 'SE');
+  const label = corp === 'CA' ? 'Camara' : 'Senado';
+  document.getElementById('mapTitle').innerHTML = 'Mapa &middot; Partido ganador por municipio';
+  document.getElementById('mapSub').innerHTML = label + ' &mdash; pasa el cursor o haz clic en un municipio.';
+  document.getElementById('hbarTitle').innerHTML = 'Municipios ganados por partido &middot; ' + label;
+  renderKPIs();
   renderMap();
   renderLegend();
+  renderHbar();
   if (selectedFeature) showPanel(selectedFeature);
+  else showDefaultPanel();
 }
 
 function renderLegend() {
-  const items = [
-    { name: 'Alianza Verde', color: '#007C34' },
-    { name: 'Pacto Histórico', color: '#7B2D8B' },
-    { name: 'Centro Democrático', color: '#1E477D' },
-    { name: 'Conservador', color: '#E07B00' },
-    { name: 'Otro', color: '#AAAAAA' },
-  ];
+  const mg = DATA.mapagan && DATA.mapagan[currentCorp] ? DATA.mapagan[currentCorp] : [];
+  // Contar por partido
+  const counts = {};
+  mg.forEach(m => {
+    const key = m.partido;
+    if (!counts[key]) counts[key] = { color: m.color, n: 0 };
+    counts[key].n++;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1].n - a[1].n);
+  // Agrupar "otros" (partidos con pocos municipios)
+  const knownParties = ['Alianza Verde', 'Centro Democratico', 'Centro Democr\u00e1tico', 'Conservador', 'Pacto Hist\u00f3rico', 'Pacto Historico'];
+  const items = [];
+  let otrosCount = 0;
+  sorted.forEach(([name, info]) => {
+    const isKnown = knownParties.some(k => normalizar(k) === normalizar(name));
+    if (isKnown) {
+      items.push({ name, color: info.color, n: info.n });
+    } else {
+      otrosCount += info.n;
+    }
+  });
+  if (otrosCount > 0) items.push({ name: 'Otros', color: '#888', n: otrosCount });
+
   document.getElementById('legend').innerHTML = items.map(i =>
-    `<span class="legend-item"><span class="legend-dot" style="background:${i.color}"></span>${i.name}</span>`
+    `<span class="legend-item"><span class="legend-dot" style="background:${i.color}"></span>${i.name} <span class="legend-count">${i.n}</span></span>`
   ).join('');
 }
 
-// === 1. Comparativo ===
+// === Municipios ganados (horizontal bar) ===
+function renderHbar() {
+  const mg = DATA.mapagan && DATA.mapagan[currentCorp] ? DATA.mapagan[currentCorp] : [];
+  const counts = {};
+  const colors = {};
+  mg.forEach(m => {
+    const key = m.partido;
+    counts[key] = (counts[key] || 0) + 1;
+    colors[key] = m.color;
+  });
+  // Agrupar "otros"
+  const knownParties = ['Alianza Verde', 'Centro Democratico', 'Centro Democr\u00e1tico', 'Conservador', 'Pacto Hist\u00f3rico', 'Pacto Historico'];
+  const entries = [];
+  let otrosCount = 0;
+  Object.entries(counts).sort((a, b) => b[1] - a[1]).forEach(([name, n]) => {
+    const isKnown = knownParties.some(k => normalizar(k) === normalizar(name));
+    if (isKnown) {
+      entries.push({ name, n, color: colors[name] });
+    } else {
+      otrosCount += n;
+    }
+  });
+  if (otrosCount > 0) entries.push({ name: 'Otros', n: otrosCount, color: '#888' });
+  entries.sort((a, b) => b.n - a.n);
+
+  const maxN = Math.max(...entries.map(e => e.n), 1);
+  const container = document.getElementById('hbarPartidos');
+  container.innerHTML = entries.map(e => {
+    const pct = (e.n / maxN) * 100;
+    return `<div class="hbar-row">
+      <div class="hbar-label">${e.name}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${e.color}"></div></div>
+      <div class="hbar-value">${e.n}</div>
+    </div>`;
+  }).join('');
+}
+
+// === Comparativo ===
 function renderComparativo() {
   const d = DATA.comparativo;
   const ctx = document.getElementById('chartComparativo').getContext('2d');
   if (charts.comp) charts.comp.destroy();
+
+  // Plugin para etiquetas encima de barras
+  const topLabelPlugin = {
+    id: 'topLabel',
+    afterDatasetsDraw(chart) {
+      const { ctx: c, data } = chart;
+      chart.getDatasetMeta(0).data.forEach((bar, i) => {
+        c.save();
+        c.fillStyle = getCSS('--text');
+        c.font = 'bold 11px Consolas, monospace';
+        c.textAlign = 'center';
+        c.fillText(fmtNum(data.datasets[0].data[i]), bar.x, bar.y - 6);
+        c.restore();
+      });
+    }
+  };
+
   charts.comp = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -354,25 +752,28 @@ function renderComparativo() {
       datasets: [{
         label: 'Votos CA',
         data: d.map(x => x.votos_ca),
-        backgroundColor: ['#1E477D', '#007C34', '#E07B00', '#7B2D8B'],
-        borderRadius: 4,
+        backgroundColor: ['#2196F3', '#007C34', '#E07B00', '#7B2D8B'],
+        borderRadius: 5,
+        maxBarThickness: 60,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: c => c.raw.toLocaleString('es-CO') + ' votos' } }
+        tooltip: { callbacks: { label: c => fmtNum(c.raw) + ' votos' } }
       },
       scales: {
-        y: { beginAtZero: true, ticks: { color: getCSS('--text-muted'), callback: v => v.toLocaleString() }, grid: { color: getCSS('--border') } },
-        x: { ticks: { color: getCSS('--text') }, grid: { display: false } }
-      }
-    }
+        y: { display: false, beginAtZero: true },
+        x: { ticks: { color: getCSS('--text-muted'), font: { size: 10, weight: '600' } }, grid: { display: false } }
+      },
+      layout: { padding: { top: 25 } }
+    },
+    plugins: [topLabelPlugin]
   });
 }
 
-// === 2. Por Municipio ===
+// === Por Municipio ===
 function populateSelectors() {
   const munis = Object.keys(DATA.por_municipio);
   const sel1 = document.getElementById('selMunicipio');
@@ -381,7 +782,8 @@ function populateSelectors() {
     sel1.add(new Option(m, m));
     sel2.add(new Option(m, m));
   });
-  sel2.add(new Option('TODOS', 'TODOS'));
+  sel2.insertBefore(new Option('TODOS', 'TODOS'), sel2.firstChild);
+  sel2.value = 'TODOS';
 }
 
 function renderMunicipio() {
@@ -391,33 +793,38 @@ function renderMunicipio() {
 
   document.getElementById('liderSE').innerHTML =
     '<span class="lider-badge" style="background:' + info.lider_se.color + '">' +
-    'Líder SE: ' + info.lider_se.partido + ' (' + info.lider_se.votos.toLocaleString('es-CO') + ' votos)</span>';
+    'Lider Senado: ' + info.lider_se.partido + ' &middot; ' + fmtNum(info.lider_se.votos) + '</span>';
 
   const ctx1 = document.getElementById('chartCandidatos').getContext('2d');
   if (charts.cand) charts.cand.destroy();
   charts.cand = new Chart(ctx1, {
     type: 'bar',
     data: {
-      labels: info.top10_ca.map(x => x.candidato.length > 25 ? x.candidato.slice(0,23) + '...' : x.candidato),
+      labels: info.top10_ca.map(x => {
+        const parts = x.candidato.split(' ');
+        if (parts.length > 3) return parts.slice(0, 3).join(' ') + '...';
+        return x.candidato;
+      }),
       datasets: [{
         label: 'Votos CA',
         data: info.top10_ca.map(x => x.votos),
         backgroundColor: info.top10_ca.map(x => x.color),
         borderRadius: 3,
+        maxBarThickness: 30,
       }]
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        title: { display: true, text: 'Top 10 Candidatos CA', color: getCSS('--text') },
+        title: { display: true, text: 'TOP 10 CANDIDATOS \u00b7 CAMARA', color: getCSS('--text-muted'), font: { size: 11, weight: '600' }, align: 'start', padding: { bottom: 10 } },
         tooltip: { callbacks: {
-          label: c => info.top10_ca[c.dataIndex].partido + ': ' + c.raw.toLocaleString('es-CO')
+          label: c => info.top10_ca[c.dataIndex].partido + ': ' + fmtNum(c.raw)
         }}
       },
       scales: {
-        x: { beginAtZero: true, ticks: { color: getCSS('--text-muted') }, grid: { color: getCSS('--border') } },
-        y: { ticks: { color: getCSS('--text'), font: { size: 11 } }, grid: { display: false } }
+        x: { beginAtZero: true, ticks: { color: getCSS('--text-dim'), font: { size: 10 } }, grid: { color: getCSS('--border') + '44' } },
+        y: { ticks: { color: getCSS('--text-muted'), font: { size: 10 } }, grid: { display: false } }
       }
     }
   });
@@ -431,23 +838,32 @@ function renderMunicipio() {
       datasets: [{
         data: info.top5_partidos_se.map(x => x.votos),
         backgroundColor: info.top5_partidos_se.map(x => x.color),
+        borderColor: 'transparent',
+        borderWidth: 2,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      cutout: '55%',
       plugins: {
-        title: { display: true, text: 'Top 5 Partidos SE', color: getCSS('--text') },
-        legend: { position: 'bottom', labels: { color: getCSS('--text'), font: { size: 11 } } },
-        tooltip: { callbacks: { label: c => c.label + ': ' + c.raw.toLocaleString('es-CO') } }
+        title: { display: true, text: 'TOP 5 PARTIDOS \u00b7 SENADO', color: getCSS('--text-muted'), font: { size: 11, weight: '600' }, align: 'start', padding: { bottom: 10 } },
+        legend: {
+          position: 'right', labels: { color: getCSS('--text'), font: { size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle' }
+        },
+        tooltip: { callbacks: { label: c => c.label + ': ' + fmtNum(c.raw) } }
       }
     }
   });
 }
 
-// === 3. Arrastre ===
+// === Arrastre ===
 function renderArrastre() {
   const sel = document.getElementById('selArrastre').value;
   const filtered = sel === 'TODOS' ? DATA.arrastre : DATA.arrastre.filter(x => x.municipio === sel);
+
+  // Stats
+  const positivos = filtered.filter(x => x.ratio >= 1).length;
+  document.getElementById('arrasteStat').innerHTML = `${positivos} de ${filtered.length} zonas con arrastre positivo (ratio &ge; 1)`;
 
   const ctx = document.getElementById('chartArrastre').getContext('2d');
   if (charts.arr) charts.arr.destroy();
@@ -467,8 +883,8 @@ function renderArrastre() {
       ctx2.lineTo(chart.chartArea.right, y);
       ctx2.stroke();
       ctx2.fillStyle = getCSS('--ref-line');
-      ctx2.font = '11px sans-serif';
-      ctx2.fillText('Ref = 1.0', chart.chartArea.right - 55, y - 5);
+      ctx2.font = '11px Consolas, monospace';
+      ctx2.fillText('Ref = 1.0', chart.chartArea.right - 60, y - 6);
       ctx2.restore();
     }
   };
@@ -476,12 +892,13 @@ function renderArrastre() {
   charts.arr = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: filtered.map(x => x.zona.slice(-2) + (sel === 'TODOS' ? ' ' + x.municipio.slice(0,3) : '')),
+      labels: filtered.map(x => x.zona.slice(-2) + (sel === 'TODOS' ? '/' + x.municipio.slice(0,3) : '')),
       datasets: [{
         label: 'Ratio SE/CA',
         data: filtered.map(x => x.ratio),
         backgroundColor: filtered.map(x => x.ratio >= 1.0 ? '#007C34' : '#cc3333'),
         borderRadius: 3,
+        maxBarThickness: 35,
       }]
     },
     options: {
@@ -489,42 +906,42 @@ function renderArrastre() {
       plugins: {
         legend: { display: false },
         tooltip: { callbacks: {
-          title: c => filtered[c[0].dataIndex].municipio + ' — Zona ' + filtered[c[0].dataIndex].zona,
+          title: c => filtered[c[0].dataIndex].municipio + ' \u2014 Zona ' + filtered[c[0].dataIndex].zona,
           label: c => 'Ratio: ' + c.raw.toFixed(3) +
-            ' (CA: ' + filtered[c.dataIndex].votos_ca.toLocaleString() +
-            ', SE: ' + filtered[c.dataIndex].votos_se.toLocaleString() + ')'
+            ' (CA: ' + fmtNum(filtered[c.dataIndex].votos_ca) +
+            ', SE: ' + fmtNum(filtered[c.dataIndex].votos_se) + ')'
         }}
       },
       scales: {
         y: {
           beginAtZero: true,
-          ticks: { color: getCSS('--text-muted') },
-          grid: { color: getCSS('--border') },
-          title: { display: true, text: 'votos_SE_Verde / votos_CA_Verde', color: getCSS('--text-muted') }
+          ticks: { color: getCSS('--text-dim'), font: { size: 10 } },
+          grid: { color: getCSS('--border') + '44' },
         },
-        x: { ticks: { color: getCSS('--text'), font: { size: 10 } }, grid: { display: false },
-             title: { display: true, text: 'Zona', color: getCSS('--text-muted') } }
+        x: { ticks: { color: getCSS('--text-muted'), font: { size: 9 } }, grid: { display: false } }
       }
     },
     plugins: [refLinePlugin]
   });
 }
 
-// === Dark mode toggle (+3 bonus) ===
+// === Dark/Light toggle (+3 bonus) ===
 function toggleTheme() {
   const html = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
   html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('btnTheme').textContent = isDark ? 'Modo oscuro' : 'Modo claro';
+  document.getElementById('themeIcon').innerHTML = isDark ? '&#9790;' : '&#9788;';
+  document.getElementById('btnTheme').lastChild.textContent = isDark ? ' Oscuro' : ' Claro';
+  // Re-render charts con nuevos colores
   renderComparativo();
   renderMunicipio();
   renderArrastre();
-  // Actualizar tiles del mapa para dark mode
+  // Actualizar tiles del mapa
   if (leafletMap) {
     leafletMap.eachLayer(l => { if (l instanceof L.TileLayer) leafletMap.removeLayer(l); });
     const tileUrl = isDark
-      ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
+      ? 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
     L.tileLayer(tileUrl, { attribution: '&copy; OpenStreetMap, &copy; CARTO', maxZoom: 13 }).addTo(leafletMap);
   }
 }

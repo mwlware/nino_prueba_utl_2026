@@ -6,8 +6,8 @@ Análisis central: **arrastre Cámara → Senado** de Alianza Verde.
 
 ## Candidato
 
-- **Nombre:** Brandon Niño
-- **Email:** brandon@example.com
+- **Nombre:** Brandon Esteven Niño Quiroga
+- **Email:** brandonq718@gmail.com
 - **Repo:** https://github.com/mwlware/nino_prueba_utl_2026
 
 ## Instalación
@@ -37,11 +37,13 @@ python dashboard/export_data.py
 python viz/heatmap.py
 python viz/scatter.py
 
-# 5. Abrir dashboard (cualquiera de las dos formas)
-#    Opción A: directamente en el navegador (datos embebidos)
+# 5. Abrir dashboard en el navegador (datos embebidos, sin servidor)
+#    Windows:
 start dashboard/index.html
-#    Opción B: con servidor local
-cd dashboard && python -m http.server 8080
+#    macOS:
+open dashboard/index.html
+#    Linux:
+xdg-open dashboard/index.html
 ```
 
 Comandos adicionales del scraper:
@@ -64,29 +66,29 @@ Endpoint JSON estático de la Registraduría (sin autenticación, sin cabeceras 
 https://resultadospreccongreso2026.registraduria.gov.co/json/ACT/{CORP}/{CODIGO}.json
 ```
 
-| Parámetro | Valores |
-|-----------|---------|
-| `{CORP}` | `CA` (Cámara) o `SE` (Senado) |
-| `{CODIGO}` | Código territorial interno (no DANE). Departamento: `0700`, municipio: 7 dígitos (ej. `0700001`), zona: 9 dígitos (ej. `070000101`) |
+| Parámetro   | Valores                                                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{CORP}`   | `CA` (Cámara) o `SE` (Senado)                                                                                                          |
+| `{CODIGO}` | Código territorial interno (no DANE). Departamento:`0700`, municipio: 7 dígitos (ej. `0700001`), zona: 9 dígitos (ej. `070000101`) |
 
 **Campos principales del JSON:**
 
-| Campo | Descripción |
-|-------|-------------|
-| `elec` | Identificador de elección |
-| `amb` | Código del ámbito consultado |
-| `mdhm` | Fecha/hora del boletín (ej. `"03082211"` = 8 marzo 22:11) |
-| `camaras[].cam` | Tipo de cámara: `"1"` = territorial CA, `"0"` = nacional SE, `"4"` = indígena |
-| `partotabla[].act.codpar` | Código del partido |
-| `partotabla[].act.vot` | Votos totales del partido en el ámbito |
-| `cantotabla[].codcan` | Código de candidato (`"0"` = solo por la lista) |
-| `cantotabla[].nomcan` | Nombre del candidato |
-| `cantotabla[].apecan` | Apellido del candidato |
-| `cantotabla[].vot` | Votos del candidato |
-| `cantotabla[].cedula` | Cédula del candidato |
-| `totales.act.mesesc` | Mesas escrutadas |
-| `totales.act.votant` | Total votantes |
-| `mapagan[]` | Nomenclator: array con `amb`, `nombre`, `mesesc` de cada subdivisión |
+| Campo                       | Descripción                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| `elec`                    | Identificador de elección                                                           |
+| `amb`                     | Código del ámbito consultado                                                       |
+| `mdhm`                    | Fecha/hora del boletín (ej.`"03082211"` = 8 marzo 22:11)                          |
+| `camaras[].cam`           | Tipo de cámara:`"1"` = territorial CA, `"0"` = nacional SE, `"4"` = indígena |
+| `partotabla[].act.codpar` | Código del partido                                                                  |
+| `partotabla[].act.vot`    | Votos totales del partido en el ámbito                                              |
+| `cantotabla[].codcan`     | Código de candidato (`"0"` = solo por la lista)                                   |
+| `cantotabla[].nomcan`     | Nombre del candidato                                                                 |
+| `cantotabla[].apecan`     | Apellido del candidato                                                               |
+| `cantotabla[].vot`        | Votos del candidato                                                                  |
+| `cantotabla[].cedula`     | Cédula del candidato                                                                |
+| `totales.act.mesesc`      | Mesas escrutadas                                                                     |
+| `totales.act.votant`      | Total votantes                                                                       |
+| `mapagan[]`               | Nomenclator: array con`amb`, `nombre`, `mesesc` de cada subdivisión           |
 
 **Nomenclator:** el JSON del departamento (`0700`) trae en `mapagan` el listado completo
 de 123 municipios de Boyacá con sus códigos `amb` y nombres. Se usa para poblar la tabla
@@ -97,12 +99,12 @@ No existe endpoint de puesto ni de mesa individual.
 
 ## Municipios en la BD
 
-| Municipio | Código `amb` | Zonas | Mesas | Votos CA | Votos SE |
-|-----------|-------------|-------|-------|----------|----------|
-| Tunja | 0700001 | 6 | 424 | 72,461 | 74,243 |
-| Duitama | 0700079 | 5 | 287 | 48,187 | 48,843 |
-| Sogamoso | 0700277 | 5 | 301 | 50,881 | 50,847 |
-| Paipa | 0700181 | 3 | 95 | 16,807 | 16,393 |
+| Municipio | Código`amb` | Zonas | Mesas | Votos CA | Votos SE |
+| --------- | -------------- | ----- | ----- | -------- | -------- |
+| Tunja     | 0700001        | 6     | 424   | 72,461   | 74,243   |
+| Duitama   | 0700079        | 5     | 287   | 48,187   | 48,843   |
+| Sogamoso  | 0700277        | 5     | 301   | 50,881   | 50,847   |
+| Paipa     | 0700181        | 3     | 95    | 16,807   | 16,393   |
 
 Total: **21,413 filas** en la tabla `votos`, **4,508 candidatos**, **25 partidos**.
 
@@ -113,12 +115,12 @@ Total: **21,413 filas** en la tabla `votos`, **4,508 candidatos**, **25 partidos
 El ratio `votos_SE_Verde / votos_CA_Verde` mide cuántos votos "arrastra" la lista de
 Cámara hacia el Senado para Alianza Verde:
 
-| Municipio | Votos CA Verde | Votos SE Verde | Ratio | Interpretación |
-|-----------|---------------|---------------|-------|----------------|
-| Duitama | 6,507 | 8,371 | **1.286** | SE obtiene 29% más que CA |
-| Tunja | 15,836 | 16,296 | **1.029** | Arrastre neutro (+3%) |
-| Sogamoso | 8,086 | 8,195 | **1.013** | Prácticamente igual |
-| Paipa | 7,171 | 4,161 | **0.580** | SE pierde 42% respecto a CA |
+| Municipio | Votos CA Verde | Votos SE Verde | Ratio           | Interpretación             |
+| --------- | -------------- | -------------- | --------------- | --------------------------- |
+| Duitama   | 6,507          | 8,371          | **1.286** | SE obtiene 29% más que CA  |
+| Tunja     | 15,836         | 16,296         | **1.029** | Arrastre neutro (+3%)       |
+| Sogamoso  | 8,086          | 8,195          | **1.013** | Prácticamente igual        |
+| Paipa     | 7,171          | 4,161          | **0.580** | SE pierde 42% respecto a CA |
 
 **Paipa es la anomalía:** Verde pierde casi la mitad de sus votos al pasar de Cámara a
 Senado, sugiriendo que el electorado de Cámara en Paipa vota por candidatos locales
@@ -149,11 +151,14 @@ recibiendo ~1.5% más votos en promedio.
 
 ## Bonus implementados
 
-| Bonus | Puntos | Descripción |
-|-------|--------|-------------|
-| `--preflight` | +3 | Muestra conteo esperado de requests sin descargar |
-| 4 índices SQL con justificación | +2 | `idx_votos_amb`, `idx_votos_codpar`, `idx_votos_zona`, `idx_votos_corp_amb` |
-| Dark mode (CSS custom properties) | +3 | Toggle en dashboard con re-render de gráficos |
-| Exportar CSV | +2 | 3 botones: comparativo, municipio, arrastre |
-| Heatmap anotado | — | Top 8 candidatos × 4 municipios, % por municipio |
-| Scatter OLS + Pearson | — | r, pendiente, n impreso en consola y anotado en gráfico |
+| Bonus                              | Puntos | Descripción                                                                             |
+| ---------------------------------- | ------ | ---------------------------------------------------------------------------------------- |
+| `--preflight`                    | +3     | Muestra conteo esperado de requests sin descargar                                        |
+| 4 índices SQL con justificación  | +2     | `idx_votos_amb`, `idx_votos_codpar`, `idx_votos_zona`, `idx_votos_corp_amb`      |
+| Explicación atribución 3.3       | +2     | Documentado en Hallazgos punto 2: por qué top CA ≠ top atribución SE                  |
+| Dark mode (CSS custom properties)  | +3     | Toggle en dashboard con re-render de gráficos y tiles del mapa                          |
+| Exportar CSV                       | +2     | 3 botones: comparativo, municipio, arrastre                                              |
+| Mapa coroplético 123 municipios   | extra  | Mapa Leaflet de todo Boyacá con toggle CA/SE, búsqueda, panel de detalle y leyenda     |
+| Scraper extendido a 123 municipios | +3     | `export_data.py` descarga y mapea los 123 municipios del departamento vía `mapagan` |
+| Heatmap anotado                    | —     | Top 8 candidatos × 4 municipios, % por municipio                                        |
+| Scatter OLS + Pearson              | —     | r, pendiente, n impreso en consola y anotado en gráfico                                 |

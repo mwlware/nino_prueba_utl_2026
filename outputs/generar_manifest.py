@@ -12,8 +12,8 @@ from datetime import datetime
 # === META (editar con datos reales del candidato) ===
 META = {
     "nombre": "Brandon Niño",
-    "email": "brandon@example.com",
-    "repo": "https://github.com/usuario/PruebaTecnica",
+    "email": "brandonq718@gmail.com",
+    "repo": "https://github.com/mwlware/nino_prueba_utl_2026",
     "fecha_generacion": None,  # se llena automáticamente
 }
 
